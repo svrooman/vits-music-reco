@@ -42,6 +42,12 @@ class SpotifyService
         }
 
         $expiresAt = session('spotify_token_expires_at');
+
+        // Handle both Carbon instances and timestamps
+        if (is_numeric($expiresAt)) {
+            $expiresAt = \Carbon\Carbon::createFromTimestamp($expiresAt);
+        }
+
         // Add 5 minute buffer - refresh if token expires in less than 5 minutes
         return now()->addMinutes(5)->isAfter($expiresAt);
     }
