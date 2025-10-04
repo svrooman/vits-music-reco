@@ -19,8 +19,9 @@
             />
 
             <!-- Number of Tracks -->
-            <x-inputs.number
+            <x-input
                 wire:model="numberOfTracks"
+                type="number"
                 label="Number of Tracks"
                 min="1"
                 max="50"
