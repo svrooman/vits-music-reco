@@ -393,9 +393,17 @@ No explanations or additional text, just the JSON array.";
 
         // Check if user is authenticated with Spotify
         if (!session()->has('spotify_access_token')) {
-            logger()->info('Spotify validation skipped - user not authenticated');
+            logger()->warning('Spotify validation skipped - user not authenticated', [
+                'has_session' => session()->has('spotify_user_data'),
+                'session_keys' => array_keys(session()->all())
+            ]);
             return $tracks;
         }
+
+        logger()->info('Starting Spotify track validation', [
+            'track_count' => count($tracks),
+            'has_token' => true
+        ]);
 
         $validatedTracks = [];
         $maxDurationMs = $options['max_duration_minutes'] * 60 * 1000;
