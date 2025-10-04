@@ -29,7 +29,7 @@ class PlaylistController extends Controller
             $accessToken = session('spotify_access_token');
             if ($accessToken) {
                 foreach ($playlists as $playlist) {
-                    if ($playlist->spotify_playlist_id && !$playlist->cover_image_url) {
+                    if ($playlist->spotify_playlist_id) {
                         try {
                             $response = Http::withToken($accessToken)
                                 ->get("https://api.spotify.com/v1/playlists/{$playlist->spotify_playlist_id}", [
@@ -40,8 +40,12 @@ class PlaylistController extends Controller
                             if (!empty($response['images'])) {
                                 // Spotify returns images in descending size order, get the largest (first)
                                 $coverUrl = $response['images'][0]['url'];
-                                $playlist->cover_image_url = $coverUrl;
-                                $playlist->save();
+
+                                // Update if changed or missing
+                                if ($playlist->cover_image_url !== $coverUrl) {
+                                    $playlist->cover_image_url = $coverUrl;
+                                    $playlist->save();
+                                }
                             }
                         } catch (\Exception $e) {
                             // Silently fail - playlist will just not have cover art
