@@ -15,6 +15,9 @@ class PlaylistGenerator extends Component
     public $playlistId = null;
     public $generatedTracks = [];
     public $showPreview = false;
+    public $showReplaceModal = false;
+    public $replaceTrackIndex = null;
+    public $replacementSuggestion = '';
 
     public function submit()
     {
@@ -103,6 +106,105 @@ class PlaylistGenerator extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Error: ' . $e->getMessage());
         }
+    }
+
+    public function openReplaceModal($index)
+    {
+        $this->replaceTrackIndex = $index;
+        $this->showReplaceModal = true;
+        $this->replacementSuggestion = '';
+    }
+
+    public function closeReplaceModal()
+    {
+        $this->showReplaceModal = false;
+        $this->replaceTrackIndex = null;
+        $this->replacementSuggestion = '';
+    }
+
+    public function replaceTrack()
+    {
+        if ($this->replaceTrackIndex === null || !isset($this->generatedTracks[$this->replaceTrackIndex])) {
+            return;
+        }
+
+        try {
+            $playlistGeneratorService = new PlaylistGeneratorService(new SpotifyService());
+            $currentTrack = $this->generatedTracks[$this->replaceTrackIndex];
+
+            // If user provided a suggestion, use it
+            if (!empty($this->replacementSuggestion)) {
+                // Parse the suggestion (format: "Artist - Track")
+                if (strpos($this->replacementSuggestion, ' - ') !== false) {
+                    [$artist, $track] = explode(' - ', $this->replacementSuggestion, 2);
+                    $searchQuery = trim($artist) . ' ' . trim($track);
+                } else {
+                    $searchQuery = $this->replacementSuggestion;
+                }
+
+                // Search for the suggested track on Spotify
+                $spotifyService = new SpotifyService();
+                $searchResults = $spotifyService->getTrackIds('', '', $searchQuery);
+
+                if (!empty($searchResults['tracks']['items'])) {
+                    $spotifyTrack = $searchResults['tracks']['items'][0];
+                    $this->generatedTracks[$this->replaceTrackIndex] = [
+                        'artist' => $spotifyTrack['artists'][0]['name'],
+                        'track' => $spotifyTrack['name'],
+                        'album' => $spotifyTrack['album']['name'],
+                        'year' => isset($spotifyTrack['album']['release_date']) ? substr($spotifyTrack['album']['release_date'], 0, 4) : null,
+                        'spotify_id' => $spotifyTrack['id'],
+                        'spotify_url' => $spotifyTrack['external_urls']['spotify'],
+                        'actual_duration' => $this->msToMinutesSeconds($spotifyTrack['duration_ms']),
+                        'spotify_uri' => $spotifyTrack['uri'],
+                        'album_image' => $spotifyTrack['album']['images'][2]['url'] ?? $spotifyTrack['album']['images'][0]['url'] ?? null,
+                    ];
+                } else {
+                    session()->flash('error', 'Could not find the suggested track on Spotify');
+                    return;
+                }
+            } else {
+                // AI automatic replacement - ask for a similar track
+                $inspiration = "A track similar to {$currentTrack['track']} by {$currentTrack['artist']} that would fit in a playlist about: {$this->description}";
+
+                $result = $playlistGeneratorService->generatePlaylist($inspiration, 1, [
+                    'validate_with_spotify' => true,
+                    'banned_artists' => array_column($this->generatedTracks, 'artist') // Don't suggest artists already in playlist
+                ]);
+
+                if ($result['success'] && !empty($result['tracks'])) {
+                    $this->generatedTracks[$this->replaceTrackIndex] = $result['tracks'][0];
+                } else {
+                    session()->flash('error', 'Could not find a replacement track');
+                    return;
+                }
+            }
+
+            $this->closeReplaceModal();
+            session()->flash('success', 'Track replaced successfully!');
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error replacing track: ' . $e->getMessage());
+        }
+    }
+
+    public function updateTrackOrder($orderedIndexes)
+    {
+        $newOrder = [];
+        foreach ($orderedIndexes as $index) {
+            if (isset($this->generatedTracks[$index])) {
+                $newOrder[] = $this->generatedTracks[$index];
+            }
+        }
+        $this->generatedTracks = $newOrder;
+    }
+
+    protected function msToMinutesSeconds($ms)
+    {
+        $seconds = floor($ms / 1000);
+        $minutes = floor($seconds / 60);
+        $seconds = $seconds % 60;
+        return sprintf('%d:%02d', $minutes, $seconds);
     }
 
     public function render()

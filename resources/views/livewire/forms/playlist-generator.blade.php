@@ -22,9 +22,15 @@
             </div>
 
             <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <div class="max-h-96 overflow-y-auto">
+                <div class="max-h-96 overflow-y-auto" id="track-list">
                     @foreach($generatedTracks as $index => $track)
-                        <div class="flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
+                        <div class="track-item flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}">
+                            <!-- Drag Handle -->
+                            <div class="drag-handle flex-shrink-0 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"/>
+                                </svg>
+                            </div>
                             <div class="flex-shrink-0 text-gray-400 text-sm w-6">{{ $index + 1 }}</div>
                             @if(isset($track['album_image']))
                                 <img src="{{ $track['album_image'] }}"
@@ -43,6 +49,13 @@
                             @if(isset($track['actual_duration']))
                                 <div class="text-sm text-gray-400">{{ $track['actual_duration'] }}</div>
                             @endif
+                            <!-- Replace Track Button -->
+                            <button wire:click="openReplaceModal({{ $index }})"
+                                    class="flex-shrink-0 text-gray-400 hover:text-indigo-600 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                            </button>
                         </div>
                     @endforeach
                 </div>
@@ -113,6 +126,72 @@
                    class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors">
                     Open in Spotify
                 </a>
+            </div>
+        </div>
+    @endif
+
+    <!-- Replace Track Modal -->
+    @if($showReplaceModal && isset($generatedTracks[$replaceTrackIndex]))
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="closeReplaceModal">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4" wire:click.stop>
+                @php
+                    $track = $generatedTracks[$replaceTrackIndex];
+                @endphp
+
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Replace Track</h3>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6">
+                    <!-- Album Art & Track Info -->
+                    <div class="flex items-start gap-4 mb-6">
+                        @if(isset($track['album_image']))
+                            <img src="{{ $track['album_image'] }}"
+                                 alt="{{ $track['album'] ?? '' }}"
+                                 class="w-24 h-24 rounded object-cover flex-shrink-0">
+                        @else
+                            <div class="w-24 h-24 rounded bg-gray-200 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+                                </svg>
+                            </div>
+                        @endif
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 mb-1">{{ $track['track'] }}</h4>
+                            <p class="text-sm text-gray-600">{{ $track['artist'] }}</p>
+                            <p class="text-sm text-gray-500">{{ $track['album'] ?? 'Unknown Album' }}</p>
+                            @if(isset($track['year']))
+                                <p class="text-xs text-gray-400 mt-1">{{ $track['year'] }}</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Suggestion Input -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Replacement Suggestion (optional)
+                        </label>
+                        <input wire:model="replacementSuggestion"
+                               type="text"
+                               placeholder="e.g., 'Artist - Song Title' or leave empty for automatic"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <p class="text-xs text-gray-500 mt-1">Leave empty for AI to suggest a replacement automatically</p>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-4 border-t border-gray-200 flex gap-3">
+                    <button wire:click="closeReplaceModal"
+                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors">
+                        Cancel
+                    </button>
+                    <button wire:click="replaceTrack"
+                            class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+                        Replace Track
+                    </button>
+                </div>
             </div>
         </div>
     @endif
