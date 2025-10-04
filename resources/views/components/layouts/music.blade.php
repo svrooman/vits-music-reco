@@ -51,7 +51,7 @@
                             </a>
                         </div>
                     @else
-                        <x-button href="{{ route('spotify.auth') }}" primary>
+                        <x-button href="{{ route('spotify.auth') }}" teal>
                             Connect Spotify
                         </x-button>
                     @endif
