@@ -35,10 +35,34 @@ class SpotifyService
         }
     }
 
+    private function isTokenExpired()
+    {
+        if (!session()->has('spotify_token_expires_at')) {
+            return true;
+        }
+
+        $expiresAt = session('spotify_token_expires_at');
+        // Add 5 minute buffer - refresh if token expires in less than 5 minutes
+        return now()->addMinutes(5)->isAfter($expiresAt);
+    }
+
     private function refreshTokenIfNeeded()
     {
-        if ($this->isTokenExpired() && session()->has('spotify_refresh_token')) {
+        $isExpired = $this->isTokenExpired();
+        $hasRefreshToken = session()->has('spotify_refresh_token');
+
+        logger()->info('Token refresh check', [
+            'is_expired' => $isExpired,
+            'has_refresh_token' => $hasRefreshToken,
+            'expires_at' => session('spotify_token_expires_at'),
+            'current_time' => now()->toDateTimeString()
+        ]);
+
+        if ($isExpired && $hasRefreshToken) {
+            logger()->info('Attempting to refresh token...');
             $this->refreshToken();
+            // Update the access token in this instance
+            $this->accessToken = session('spotify_access_token');
         }
     }
 
@@ -80,6 +104,8 @@ class SpotifyService
     // Rest of your existing methods stay the same...
     public function createPlaylist($playlistName, $isPublic = false)
     {
+        $this->refreshTokenIfNeeded();
+
         $user = $this->user;
 
         if (!$user) {
@@ -97,6 +123,8 @@ class SpotifyService
 
     public function getTrackIds($artist, $album, $track)
     {
+        $this->refreshTokenIfNeeded();
+
         // Only include album if it's meaningful
         if (!empty($album) && strlen(trim($album)) > 2) {
             $preciseQuery = sprintf(
@@ -187,6 +215,8 @@ class SpotifyService
 
     public function addTracksToPlaylist($playlistId, $trackUris)
     {
+        $this->refreshTokenIfNeeded();
+
         return $this->request('post', "/playlists/{$playlistId}/tracks", [
             'uris' => $trackUris,
         ]);
