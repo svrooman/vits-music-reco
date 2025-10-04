@@ -1,13 +1,15 @@
 import Sortable from 'sortablejs';
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';
-import '../../vendor/wire-elements/modal/resources/js/modal';
 
 // Register Alpine plugins
 Alpine.plugin(focus);
 
-// Make Alpine available globally before it auto-starts
+// Make Alpine available globally
 window.Alpine = Alpine;
+
+// Import wire-elements modal
+import '../../vendor/wire-elements/modal/resources/js/modal';
 
 // Start Alpine
 Alpine.start();
