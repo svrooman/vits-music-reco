@@ -5,7 +5,6 @@
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Create Playlist</h1>
                 <p class="text-gray-600">Generate track-by-track playlists from any inspiration using AI</p>
-                <button wire:click="$dispatch('openModal', { component: 'modals.test-modal' })" class="mt-2 px-4 py-2 bg-red-600 text-white rounded">TEST MODAL</button>
             </div>
             @if(!session()->has('spotify_user_data'))
                 <a href="{{ route('spotify.auth') }}"
