@@ -22,7 +22,7 @@
             </div>
 
             <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <div class="max-h-96 overflow-y-auto" id="track-list">
+                <div class="max-h-96 overflow-y-auto" id="track-list" wire:ignore.self>
                     @foreach($generatedTracks as $index => $track)
                         <div class="track-item flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}">
                             <!-- Drag Handle -->
@@ -137,7 +137,7 @@
              @click="$wire.closeReplaceModal()">
 
             <!-- Background backdrop -->
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-50 transition-opacity"
                  x-show="show"
                  x-transition:enter="ease-out duration-300"
                  x-transition:enter-start="opacity-0"
