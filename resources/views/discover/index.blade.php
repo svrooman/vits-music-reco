@@ -2,18 +2,11 @@
     <div>
         <!-- Prompt Input Section -->
         <div class="mb-8">
-            <div class="rounded-md bg-white dark:bg-secondary-900 shadow-sm">
-                <div class="border-secondary-200 dark:border-secondary-600 px-4 py-2.5 flex justify-between items-center rounded-t-md border-b">
-                    <div class="font-medium text-base whitespace-normal text-secondary-700 dark:text-secondary-400">
-                        Discover Music
-                    </div>
-                </div>
-                <div class="text-secondary-700 dark:text-secondary-400 px-2 py-5 md:px-4">
-                    <input
-                        type="text"
+            <x-card title="Discover Music">
+                <div class="space-y-4">
+                    <x-input
                         id="discover-prompt"
                         placeholder="What music do you want to discover?"
-                        class="w-full bg-transparent border-none text-2xl text-gray-900 dark:text-gray-400 placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-0 mb-6"
                         autofocus
                     />
 
@@ -31,15 +24,15 @@
                             <option value="20">20 items</option>
                         </x-select>
                     </div>
-                </div>
-                <div class="border-secondary-200 dark:border-secondary-600 rounded-b-md bg-transparent border-t px-4 py-4 sm:px-6 flex items-center justify-end gap-x-3">
+
                     <x-button
                         id="generate-btn"
-                        teal>
+                        primary
+                        class="w-full">
                         Generate
                     </x-button>
                 </div>
-            </div>
+            </x-card>
         </div>
 
         <!-- Loading State -->
@@ -55,13 +48,12 @@
                 <div class="flex gap-3">
                     <x-button
                         id="select-all-btn"
-                        gray
                         flat>
                         Select All
                     </x-button>
                     <x-button
                         id="add-to-spotify-btn"
-                        teal
+                        primary
                         disabled>
                         Add to Spotify
                     </x-button>

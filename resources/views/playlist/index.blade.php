@@ -21,16 +21,9 @@
 
         <!-- Playlist Generation Form -->
         <div class="mb-12">
-            <div class="rounded-md bg-white dark:bg-secondary-900 shadow-sm">
-                <div class="border-secondary-200 dark:border-secondary-600 px-4 py-2.5 flex justify-between items-center rounded-t-md border-b">
-                    <div class="font-medium text-base whitespace-normal text-secondary-700 dark:text-secondary-400">
-                        Generate Playlist
-                    </div>
-                </div>
-                <div class="text-secondary-700 dark:text-secondary-400 px-2 py-5 md:px-4">
-                    @livewire('forms.playlist-generator')
-                </div>
-            </div>
+            <x-card title="Generate Playlist">
+                @livewire('forms.playlist-generator')
+            </x-card>
         </div>
 
         <!-- Recent Playlists -->
@@ -54,7 +47,7 @@
                                             href="https://open.spotify.com/playlist/{{ $playlist->spotify_playlist_id }}"
                                             target="_blank"
                                             xs
-                                            teal>
+                                            primary>
                                             Open
                                         </x-button>
                                     @endif
