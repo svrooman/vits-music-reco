@@ -18,6 +18,9 @@ class PlaylistGenerator extends Component
 
     public function submit()
     {
+        // Clear previous success message and playlist ID
+        $this->playlistId = null;
+
         // Validate
         $this->validate([
             'name' => 'required|string|max:255',
