@@ -1,33 +1,48 @@
 import Sortable from 'sortablejs';
 
-// Initialize Sortable on track lists when Livewire loads
-document.addEventListener('livewire:navigated', initSortable);
-document.addEventListener('DOMContentLoaded', initSortable);
+// Initialize Sortable when Livewire component loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSortable();
+});
 
-// Re-initialize after Livewire updates
-document.addEventListener('livewire:update', initSortable);
+// Re-initialize when Livewire updates the DOM
+document.addEventListener('livewire:init', () => {
+    Livewire.hook('morph.updated', ({ el, component }) => {
+        initializeSortable();
+    });
+});
 
-function initSortable() {
+function initializeSortable() {
     const trackList = document.getElementById('track-list');
 
-    if (trackList && !trackList.classList.contains('sortable-initialized')) {
-        Sortable.create(trackList, {
-            handle: '.drag-handle',
-            animation: 150,
-            ghostClass: 'bg-indigo-50',
-            chosenClass: 'bg-indigo-100',
-            dragClass: 'opacity-50',
-            onEnd: function (evt) {
-                // Get the new order of track indexes
-                const items = trackList.querySelectorAll('.track-item');
-                const newOrder = Array.from(items).map(item => parseInt(item.dataset.index));
+    if (!trackList) return;
 
-                // Call Livewire method to update the order
-                Livewire.find(trackList.closest('[wire\\:id]').getAttribute('wire:id'))
-                    .call('updateTrackOrder', newOrder);
-            }
-        });
-
-        trackList.classList.add('sortable-initialized');
+    // Destroy existing sortable instance if it exists
+    if (trackList.sortableInstance) {
+        trackList.sortableInstance.destroy();
     }
+
+    // Create new sortable instance
+    trackList.sortableInstance = Sortable.create(trackList, {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'bg-indigo-50',
+        chosenClass: 'bg-indigo-100',
+        dragClass: 'opacity-50',
+        forceFallback: true,
+        onEnd: function (evt) {
+            // Get the new order of track indexes
+            const items = trackList.querySelectorAll('.track-item');
+            const newOrder = Array.from(items).map(item => parseInt(item.dataset.index));
+
+            // Find the Livewire component and call the method
+            const component = trackList.closest('[wire\\:id]');
+            if (component) {
+                const componentId = component.getAttribute('wire:id');
+                if (componentId && window.Livewire) {
+                    window.Livewire.find(componentId).call('updateTrackOrder', newOrder);
+                }
+            }
+        }
+    });
 }

@@ -22,9 +22,9 @@
             </div>
 
             <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <div class="max-h-96 overflow-y-auto" id="track-list">
+                <div class="max-h-96 overflow-y-auto" id="track-list" wire:ignore>
                     @foreach($generatedTracks as $index => $track)
-                        <div class="track-item flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}">
+                        <div class="track-item flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}" wire:key="track-{{ $index }}">
                             <!-- Drag Handle -->
                             <div class="drag-handle flex-shrink-0 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -35,10 +35,10 @@
                             @if(isset($track['album_image']))
                                 <img src="{{ $track['album_image'] }}"
                                      alt="{{ $track['album'] ?? '' }}"
-                                     class="w-10 h-10 rounded object-cover"
+                                     class="w-10 h-10 rounded object-cover flex-shrink-0"
                                      onerror="this.src='https://placehold.co/40x40/e5e7eb/6b7280?text={{ urlencode(substr($track['artist'], 0, 1)) }}'">
                             @else
-                                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-semibold">
+                                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-semibold flex-shrink-0">
                                     {{ strtoupper(substr($track['artist'], 0, 1)) }}
                                 </div>
                             @endif
@@ -47,14 +47,12 @@
                                 <div class="text-sm text-gray-500 truncate">{{ $track['artist'] }} • {{ $track['album'] ?? 'Unknown Album' }}</div>
                             </div>
                             @if(isset($track['actual_duration']))
-                                <div class="text-sm text-gray-400">{{ $track['actual_duration'] }}</div>
+                                <div class="text-sm text-gray-400 flex-shrink-0">{{ $track['actual_duration'] }}</div>
                             @endif
-                            <!-- Replace Track Button -->
-                            <button wire:click="openReplaceModal({{ $index }})"
-                                    class="flex-shrink-0 text-gray-400 hover:text-indigo-600 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
+                            <!-- View/Replace Track Button -->
+                            <button wire:click="openReplaceModal({{ $index }})" type="button"
+                                    class="flex-shrink-0 px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 border border-gray-300 hover:border-indigo-600 rounded transition-colors">
+                                View
                             </button>
                         </div>
                     @endforeach
@@ -132,7 +130,7 @@
 
     <!-- Replace Track Modal -->
     @if($showReplaceModal && isset($generatedTracks[$replaceTrackIndex]))
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="closeReplaceModal">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click="closeReplaceModal">
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4" wire:click.stop>
                 @php
                     $track = $generatedTracks[$replaceTrackIndex];
