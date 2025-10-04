@@ -1,23 +1,16 @@
 import Sortable from 'sortablejs';
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';
-
-// Import wire-elements modal
 import '../../vendor/wire-elements/modal/resources/js/modal';
 
 // Register Alpine plugins
 Alpine.plugin(focus);
 
-// Make Alpine available globally but don't start yet
+// Make Alpine available globally before it auto-starts
 window.Alpine = Alpine;
 
-// Wait for Livewire to be ready before starting Alpine
-document.addEventListener('livewire:init', () => {
-    // Now start Alpine after Livewire is initialized
-    if (!Alpine.isInitialized) {
-        Alpine.start();
-    }
-});
+// Start Alpine
+Alpine.start();
 
 // Initialize Sortable when Livewire component loads
 document.addEventListener('DOMContentLoaded', function() {
