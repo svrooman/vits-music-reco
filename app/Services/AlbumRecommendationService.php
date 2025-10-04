@@ -251,6 +251,8 @@ OUTPUT FORMAT (JSON only, no other text):
                             'limit' => 1
                         ])->json();
 
+                    Log::info("Spotify search result:", ['items_count' => count($searchResult['albums']['items'] ?? [])]);
+
                     // If no exact match, try broader search
                     if (empty($searchResult['albums']['items'])) {
                         $query = sprintf('%s %s', $artist, $album);
@@ -262,6 +264,8 @@ OUTPUT FORMAT (JSON only, no other text):
                                 'type' => 'album',
                                 'limit' => 1
                             ])->json();
+
+                        Log::info("Broader search result:", ['items_count' => count($searchResult['albums']['items'] ?? []), 'error' => $searchResult['error'] ?? null]);
                     }
 
                     if (!empty($searchResult['albums']['items'])) {
@@ -317,8 +321,10 @@ OUTPUT FORMAT (JSON only, no other text):
      */
     public function addToSpotifyLibrary($recommendations, $type = 'albums')
     {
-        if (!$this->spotifyService) {
-            throw new Exception('Spotify service not available');
+        $accessToken = session('spotify_access_token');
+
+        if (!$accessToken) {
+            throw new Exception('Not authenticated with Spotify');
         }
 
         $added = [];
@@ -330,7 +336,7 @@ OUTPUT FORMAT (JSON only, no other text):
                     // Save album to library
                     $albumId = $rec['spotify_data']['id'];
 
-                    Http::withToken(session('spotify_access_token'))
+                    Http::withToken($accessToken)
                         ->put(config('services.spotify.api_url') . '/me/albums', [
                             'ids' => [$albumId]
                         ])->throw();
