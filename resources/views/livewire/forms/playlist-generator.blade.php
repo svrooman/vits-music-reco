@@ -1,6 +1,6 @@
-<div>
+<div class="relative min-h-[400px]">
     <!-- Loading State -->
-    <div wire:loading class="flex items-center justify-center min-h-[400px]">
+    <div wire:loading class="absolute inset-0 flex items-center justify-center bg-white z-10">
         <div class="text-center">
             <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
             <p class="text-gray-600 mt-4">
