@@ -69,7 +69,7 @@
         </div>
     </footer>
 
-    @livewireScripts
     @livewire('wire-elements-modal')
+    @livewireScripts
 </body>
 </html>
