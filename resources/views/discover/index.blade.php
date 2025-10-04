@@ -139,7 +139,10 @@
             recommendationsContainer.innerHTML = '';
             selectedRecommendations = [];
 
+            console.log('Recommendations received:', recommendations);
+
             recommendations.forEach((rec, index) => {
+                console.log(`Recommendation ${index}:`, rec);
                 const card = createRecommendationCard(rec, index);
                 recommendationsContainer.appendChild(card);
             });
@@ -154,7 +157,7 @@
             div.className = 'bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition-all cursor-pointer group';
 
             const hasSpotifyData = rec.spotify_data?.available;
-            const imageUrl = rec.spotify_data?.image || 'https://via.placeholder.com/300x300?text=No+Image';
+            const imageUrl = rec.spotify_data?.image || 'https://placehold.co/300x300/e5e7eb/6b7280?text=No+Image';
 
             div.innerHTML = `
                 <div class="flex gap-4 p-4">
