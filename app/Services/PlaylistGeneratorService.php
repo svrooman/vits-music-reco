@@ -431,7 +431,18 @@ No explanations or additional text, just the JSON array.";
                 $track['spotify_url'] = $spotifyTrack['external_urls']['spotify'];
                 $track['actual_duration'] = $this->msToMinutesSeconds($spotifyTrack['duration_ms']);
                 $track['spotify_uri'] = $spotifyTrack['uri']; // Useful for adding to playlists later
-                $track['album_image'] = $spotifyTrack['album']['images'][2]['url'] ?? $spotifyTrack['album']['images'][0]['url'] ?? null; // Small or largest
+
+                // Get album image - use largest available
+                if (!empty($spotifyTrack['album']['images']) && is_array($spotifyTrack['album']['images'])) {
+                    $track['album_image'] = $spotifyTrack['album']['images'][0]['url'] ?? null;
+                } else {
+                    $track['album_image'] = null;
+                }
+
+                logger()->info('Track validated with Spotify data', [
+                    'track' => $track['track'],
+                    'has_image' => !empty($track['album_image'])
+                ]);
 
                 $validatedTracks[] = $track;
             } catch (Exception $e) {
