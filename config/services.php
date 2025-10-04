@@ -55,4 +55,8 @@ return [
         'rag_api_url' => env('LOCAL_LIBRARY_RAG_API_URL', 'http://minipc.local:8889'),
     ],
 
+    'ai' => [
+        'provider' => env('AI_PROVIDER', 'claude'), // claude or openai
+    ],
+
 ];

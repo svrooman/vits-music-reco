@@ -152,7 +152,7 @@ class PlaylistGeneratorService
         $options = array_merge([
             'max_duration_minutes' => 12,
             'no_repeats' => true,
-            'provider' => 'claude', // Claude generally better at music
+            'provider' => config('services.ai.provider', 'claude'),
             'temperature' => 0.7,
             'validate_with_spotify' => true,
             'banned_artists' => [], // User can add their own (like Bob Dylan for electronic playlists!)

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
-use App\Services\ChatGPTService;
 use App\Services\SpotifyService;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -15,20 +14,15 @@ class SpotifyController extends Controller
 {
     protected $session;
     protected $api;
-    protected $chatGPTService;
     protected $spotifyService;
 
-    public function __construct(
-        ChatGPTService $chatGPTService,
-        SpotifyService $spotifyService
-    ) {
+    public function __construct(SpotifyService $spotifyService)
+    {
         $this->session = new Session(
             config('services.spotify.client_id'),
             config('services.spotify.client_secret'),
             config('services.spotify.redirect_uri')
         );
-
-        $this->chatGPTService = $chatGPTService;
 
         $this->spotifyService = $spotifyService;
 

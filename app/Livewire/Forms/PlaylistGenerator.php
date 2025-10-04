@@ -4,7 +4,7 @@ namespace App\Livewire\Forms;
 
 use Livewire\Component;
 use App\Services\SpotifyService;
-use App\Services\ChatGptService;
+use App\Services\PlaylistGeneratorService;
 
 class PlaylistGenerator extends Component
 {
@@ -34,31 +34,34 @@ class PlaylistGenerator extends Component
 
         try {
             // Initialize services
-            $spotifyService = new SpotifyService();
-            $chatGptService = new ChatGptService();
+            $playlistGeneratorService = new PlaylistGeneratorService(new SpotifyService());
 
-            // Generate recommendations
-            $playlistTracks = $chatGptService->generatePlaylist($this->description, $this->numberOfTracks);
+            // Generate playlist with AI and create on Spotify
+            $result = $playlistGeneratorService->generatePlaylist(
+                $this->description,
+                $this->numberOfTracks,
+                ['validate_with_spotify' => true]
+            );
+
+            if (!$result['success']) {
+                throw new \Exception($result['error'] ?? 'Failed to generate playlist');
+            }
+
+            $tracks = $result['tracks'];
 
             // Create playlist on Spotify
+            $spotifyService = new SpotifyService();
             $spotifyPlaylist = $spotifyService->createPlaylist($this->name, $this->isPublic);
             $playlistId = $spotifyPlaylist['id'];
 
-            // Search for tracks and add to playlist
-            $trackUris = [];
-            foreach ($playlistTracks as $track) {
-                $response = $spotifyService->getTrackIds(
-                    $track['artist'],
-                    $track['album'] ?? '',
-                    $track['track']
-                );
+            // Add validated tracks with Spotify URIs
+            $trackUris = array_filter(array_map(function($track) {
+                return $track['spotify_uri'] ?? null;
+            }, $tracks));
 
-                if (!empty($response['tracks']['items'])) {
-                    $trackUris[] = $response['tracks']['items'][0]['uri'];
-                }
+            if (!empty($trackUris)) {
+                $spotifyService->addTracksToPlaylist($playlistId, $trackUris);
             }
-
-            $spotifyService->addTracksToPlaylist($playlistId, $trackUris);
 
             // Get user ID
             $userId = null;
@@ -80,7 +83,7 @@ class PlaylistGenerator extends Component
                 'description' => $this->description,
                 'spotify_playlist_id' => $playlistId,
                 'spotify_playlist_uri' => "spotify:playlist:{$playlistId}",
-                'tracks' => collect($playlistTracks)->map(function ($track) {
+                'tracks' => collect($tracks)->map(function ($track) {
                     return [
                         'artist' => $track['artist'],
                         'track' => $track['track'],
