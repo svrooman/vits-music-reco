@@ -74,10 +74,10 @@ class SpotifyController extends Controller
             // Flash success message for toast notification
             session()->flash('success', 'Successfully connected to Spotify!');
 
-            return redirect()->route('playlist.index');
+            return redirect()->route('home');
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to authenticate with Spotify: ' . $e->getMessage());
-            return redirect()->route('playlist.index');
+            return redirect()->route('home');
         }
     }
 
@@ -172,7 +172,7 @@ class SpotifyController extends Controller
 
         session()->flash('success', 'Successfully disconnected from Spotify.');
 
-        return redirect()->route('playlist.index');
+        return redirect()->route('home');
     }
 
     public function getAccessToken()
