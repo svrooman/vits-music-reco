@@ -15,6 +15,7 @@ class Playlist extends Model
         'description',
         'spotify_playlist_id',
         'spotify_playlist_uri',
+        'cover_image_url',
         'tidal_playlist_id',
         'tidal_playlist_uri',
         'apple_playlist_id',
