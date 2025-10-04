@@ -228,10 +228,21 @@ OUTPUT FORMAT (JSON only, no other text):
                 $album = $rec['album'] ?? $rec['essential_album'] ?? null;
 
                 if ($album) {
+                    $accessToken = session('spotify_access_token');
+
+                    if (!$accessToken) {
+                        Log::warning("No Spotify access token available for album search");
+                        $rec['spotify_data'] = ['available' => false];
+                        $enriched[] = $rec;
+                        continue;
+                    }
+
                     // Try exact search first
                     $query = sprintf('artist:"%s" album:"%s"', $artist, $album);
 
-                    $searchResult = Http::withToken(session('spotify_access_token'))
+                    Log::info("Searching Spotify for: " . $query);
+
+                    $searchResult = Http::withToken($accessToken)
                         ->get(config('services.spotify.api_url') . '/search', [
                             'q' => $query,
                             'type' => 'album',
@@ -241,7 +252,9 @@ OUTPUT FORMAT (JSON only, no other text):
                     // If no exact match, try broader search
                     if (empty($searchResult['albums']['items'])) {
                         $query = sprintf('%s %s', $artist, $album);
-                        $searchResult = Http::withToken(session('spotify_access_token'))
+                        Log::info("Trying broader search: " . $query);
+
+                        $searchResult = Http::withToken($accessToken)
                             ->get(config('services.spotify.api_url') . '/search', [
                                 'q' => $query,
                                 'type' => 'album',
