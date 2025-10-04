@@ -1,4 +1,64 @@
 <div>
+    <!-- Loading State -->
+    @if($isLoading)
+        <div class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+            <p class="text-gray-600 mt-4">{{ $showPreview ? 'Creating playlist...' : 'Generating tracks...' }}</p>
+        </div>
+    @endif
+
+    <!-- Track Preview -->
+    @if($showPreview && !$isLoading)
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Generated Tracks ({{ count($generatedTracks) }})</h3>
+                <button wire:click="$set('showPreview', false)" class="text-sm text-gray-500 hover:text-gray-700">
+                    &larr; Back to form
+                </button>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div class="max-h-96 overflow-y-auto">
+                    @foreach($generatedTracks as $index => $track)
+                        <div class="flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
+                            <div class="flex-shrink-0 text-gray-400 text-sm w-6">{{ $index + 1 }}</div>
+                            @if(isset($track['album_image']))
+                                <img src="{{ $track['album_image'] }}"
+                                     alt="{{ $track['album'] ?? '' }}"
+                                     class="w-10 h-10 rounded object-cover"
+                                     onerror="this.src='https://placehold.co/40x40/e5e7eb/6b7280?text={{ urlencode(substr($track['artist'], 0, 1)) }}'">
+                            @else
+                                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-semibold">
+                                    {{ strtoupper(substr($track['artist'], 0, 1)) }}
+                                </div>
+                            @endif
+                            <div class="flex-1 min-w-0">
+                                <div class="font-medium text-gray-900 truncate">{{ $track['track'] }}</div>
+                                <div class="text-sm text-gray-500 truncate">{{ $track['artist'] }} • {{ $track['album'] ?? 'Unknown Album' }}</div>
+                            </div>
+                            @if(isset($track['actual_duration']))
+                                <div class="text-sm text-gray-400">{{ $track['actual_duration'] }}</div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button wire:click="createPlaylist"
+                        class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+                    Create Playlist on Spotify
+                </button>
+                <button wire:click="$set('showPreview', false)"
+                        class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    @endif
+
+    <!-- Form -->
+    @if(!$showPreview && !$isLoading)
     <form wire:submit="submit" class="space-y-4">
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Playlist Name</label>
@@ -26,21 +86,12 @@
             <label for="isPublic" class="ml-2 text-sm text-gray-700">Make playlist public</label>
         </div>
 
-        <button type="submit" :disabled="$isLoading"
-                class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            @if($isLoading)
-                <span class="flex items-center justify-center">
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Generating Playlist...
-                </span>
-            @else
-                Generate Playlist
-            @endif
+        <button type="submit"
+                class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+            Generate Tracks
         </button>
     </form>
+    @endif
 
     @if($playlistId)
         <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">

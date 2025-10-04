@@ -14,6 +14,8 @@ class PlaylistGenerator extends Component
     public $description = '';
     public $isLoading = false;
     public $playlistId = null;
+    public $generatedTracks = [];
+    public $showPreview = false;
 
     public function submit()
     {
@@ -47,8 +49,25 @@ class PlaylistGenerator extends Component
                 throw new \Exception($result['error'] ?? 'Failed to generate playlist');
             }
 
-            $tracks = $result['tracks'];
+            $this->generatedTracks = $result['tracks'];
+            $this->showPreview = true;
 
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error: ' . $e->getMessage());
+        } finally {
+            $this->isLoading = false;
+        }
+    }
+
+    public function createPlaylist()
+    {
+        if (empty($this->generatedTracks)) {
+            return;
+        }
+
+        $this->isLoading = true;
+
+        try {
             // Create playlist on Spotify
             $spotifyService = new SpotifyService();
             $spotifyPlaylist = $spotifyService->createPlaylist($this->name, $this->isPublic);
@@ -57,7 +76,7 @@ class PlaylistGenerator extends Component
             // Add validated tracks with Spotify URIs
             $trackUris = array_filter(array_map(function($track) {
                 return $track['spotify_uri'] ?? null;
-            }, $tracks));
+            }, $this->generatedTracks));
 
             if (!empty($trackUris)) {
                 $spotifyService->addTracksToPlaylist($playlistId, $trackUris);
@@ -83,7 +102,7 @@ class PlaylistGenerator extends Component
                 'description' => $this->description,
                 'spotify_playlist_id' => $playlistId,
                 'spotify_playlist_uri' => "spotify:playlist:{$playlistId}",
-                'tracks' => collect($tracks)->map(function ($track) {
+                'tracks' => collect($this->generatedTracks)->map(function ($track) {
                     return [
                         'artist' => $track['artist'],
                         'track' => $track['track'],
@@ -96,7 +115,7 @@ class PlaylistGenerator extends Component
             session()->flash('success', "Playlist '{$this->name}' created successfully with " . count($trackUris) . " tracks!");
 
             // Reset form
-            $this->reset(['name', 'description', 'numberOfTracks', 'isPublic']);
+            $this->reset(['name', 'description', 'numberOfTracks', 'isPublic', 'generatedTracks', 'showPreview']);
 
         } catch (\Exception $e) {
             session()->flash('error', 'Error: ' . $e->getMessage());

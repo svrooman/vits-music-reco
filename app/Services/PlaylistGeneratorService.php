@@ -431,6 +431,7 @@ No explanations or additional text, just the JSON array.";
                 $track['spotify_url'] = $spotifyTrack['external_urls']['spotify'];
                 $track['actual_duration'] = $this->msToMinutesSeconds($spotifyTrack['duration_ms']);
                 $track['spotify_uri'] = $spotifyTrack['uri']; // Useful for adding to playlists later
+                $track['album_image'] = $spotifyTrack['album']['images'][2]['url'] ?? $spotifyTrack['album']['images'][0]['url'] ?? null; // Small or largest
 
                 $validatedTracks[] = $track;
             } catch (Exception $e) {
