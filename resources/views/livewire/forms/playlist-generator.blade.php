@@ -22,9 +22,9 @@
             </div>
 
             <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <div class="max-h-96 overflow-y-auto" id="track-list" wire:ignore>
+                <div class="max-h-96 overflow-y-auto" id="track-list">
                     @foreach($generatedTracks as $index => $track)
-                        <div class="track-item flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}" wire:key="track-{{ $index }}">
+                        <div class="track-item flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}">
                             <!-- Drag Handle -->
                             <div class="drag-handle flex-shrink-0 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -35,10 +35,10 @@
                             @if(isset($track['album_image']))
                                 <img src="{{ $track['album_image'] }}"
                                      alt="{{ $track['album'] ?? '' }}"
-                                     class="w-10 h-10 rounded object-cover flex-shrink-0"
+                                     class="w-10 h-10 rounded object-cover"
                                      onerror="this.src='https://placehold.co/40x40/e5e7eb/6b7280?text={{ urlencode(substr($track['artist'], 0, 1)) }}'">
                             @else
-                                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-semibold flex-shrink-0">
+                                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-semibold">
                                     {{ strtoupper(substr($track['artist'], 0, 1)) }}
                                 </div>
                             @endif
@@ -47,7 +47,7 @@
                                 <div class="text-sm text-gray-500 truncate">{{ $track['artist'] }} • {{ $track['album'] ?? 'Unknown Album' }}</div>
                             </div>
                             @if(isset($track['actual_duration']))
-                                <div class="text-sm text-gray-400 flex-shrink-0">{{ $track['actual_duration'] }}</div>
+                                <div class="text-sm text-gray-400">{{ $track['actual_duration'] }}</div>
                             @endif
                             <!-- View/Replace Track Button -->
                             <button wire:click="openReplaceModal({{ $index }})" type="button"
@@ -130,65 +130,94 @@
 
     <!-- Replace Track Modal -->
     @if($showReplaceModal && isset($generatedTracks[$replaceTrackIndex]))
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click="closeReplaceModal">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4" wire:click.stop>
-                @php
-                    $track = $generatedTracks[$replaceTrackIndex];
-                @endphp
+        <div class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true"
+             x-data="{ show: false }"
+             x-init="setTimeout(() => show = true, 50)"
+             x-show="show"
+             @click="$wire.closeReplaceModal()">
 
-                <!-- Modal Header -->
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Replace Track</h3>
-                </div>
+            <!-- Background backdrop -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                 x-show="show"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"></div>
 
-                <!-- Modal Body -->
-                <div class="p-6">
-                    <!-- Album Art & Track Info -->
-                    <div class="flex items-start gap-4 mb-6">
-                        @if(isset($track['album_image']))
-                            <img src="{{ $track['album_image'] }}"
-                                 alt="{{ $track['album'] ?? '' }}"
-                                 class="w-24 h-24 rounded object-cover flex-shrink-0">
-                        @else
-                            <div class="w-24 h-24 rounded bg-gray-200 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
-                                </svg>
+            <!-- Modal panel -->
+            <div class="fixed inset-0 z-10 overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+                         @click.stop
+                         x-show="show"
+                         x-transition:enter="ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                         x-transition:leave="ease-in duration-200"
+                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+
+                        @php
+                            $track = $generatedTracks[$replaceTrackIndex];
+                        @endphp
+
+                        <!-- Modal Header -->
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900" id="modal-title">Replace Track</h3>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="p-6">
+                            <!-- Album Art & Track Info -->
+                            <div class="flex items-start gap-4 mb-6">
+                                @if(isset($track['album_image']))
+                                    <img src="{{ $track['album_image'] }}"
+                                         alt="{{ $track['album'] ?? '' }}"
+                                         class="w-24 h-24 rounded object-cover flex-shrink-0">
+                                @else
+                                    <div class="w-24 h-24 rounded bg-gray-200 flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-900 mb-1">{{ $track['track'] }}</h4>
+                                    <p class="text-sm text-gray-600">{{ $track['artist'] }}</p>
+                                    <p class="text-sm text-gray-500">{{ $track['album'] ?? 'Unknown Album' }}</p>
+                                    @if(isset($track['year']))
+                                        <p class="text-xs text-gray-400 mt-1">{{ $track['year'] }}</p>
+                                    @endif
+                                </div>
                             </div>
-                        @endif
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 mb-1">{{ $track['track'] }}</h4>
-                            <p class="text-sm text-gray-600">{{ $track['artist'] }}</p>
-                            <p class="text-sm text-gray-500">{{ $track['album'] ?? 'Unknown Album' }}</p>
-                            @if(isset($track['year']))
-                                <p class="text-xs text-gray-400 mt-1">{{ $track['year'] }}</p>
-                            @endif
+
+                            <!-- Suggestion Input -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Replacement Suggestion (optional)
+                                </label>
+                                <input wire:model="replacementSuggestion"
+                                       type="text"
+                                       placeholder="e.g., 'Artist - Song Title' or leave empty for automatic"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <p class="text-xs text-gray-500 mt-1">Leave empty for AI to suggest a replacement automatically</p>
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="px-6 py-4 bg-gray-50 flex gap-3 sm:flex-row-reverse">
+                            <button wire:click="replaceTrack" type="button"
+                                    class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:w-auto">
+                                Replace Track
+                            </button>
+                            <button wire:click="closeReplaceModal" type="button"
+                                    class="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:w-auto">
+                                Cancel
+                            </button>
                         </div>
                     </div>
-
-                    <!-- Suggestion Input -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Replacement Suggestion (optional)
-                        </label>
-                        <input wire:model="replacementSuggestion"
-                               type="text"
-                               placeholder="e.g., 'Artist - Song Title' or leave empty for automatic"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <p class="text-xs text-gray-500 mt-1">Leave empty for AI to suggest a replacement automatically</p>
-                    </div>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="px-6 py-4 border-t border-gray-200 flex gap-3">
-                    <button wire:click="closeReplaceModal"
-                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition-colors">
-                        Cancel
-                    </button>
-                    <button wire:click="replaceTrack"
-                            class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
-                        Replace Track
-                    </button>
                 </div>
             </div>
         </div>
