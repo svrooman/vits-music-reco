@@ -9,10 +9,19 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <wireui:scripts />
+
+    <!-- Theme Detection Script -->
+    <script>
+        // Set theme on page load
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
-<body class="min-h-screen bg-black text-white antialiased">
+<body class="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white antialiased transition-colors">
     <!-- Minimalist Header -->
-    <header class="border-b border-zinc-800 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
+    <header class="border-b border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-black/50 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo/Brand -->
@@ -23,17 +32,18 @@
                 <!-- Navigation -->
                 <nav class="flex gap-1">
                     <a href="{{ route('home') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('home') || request()->routeIs('playlist.*') ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50' }}">
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('home') || request()->routeIs('playlist.*') ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50' }}">
                         Playlists
                     </a>
                     <a href="{{ route('discover.index') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('discover.*') ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50' }}">
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('discover.*') ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/50' }}">
                         Discover
                     </a>
                 </nav>
 
-                <!-- Spotify Auth -->
+                <!-- Theme Switcher & Spotify Auth -->
                 <div class="flex items-center gap-3">
+                    @livewire('theme-switcher')
                     @if(session()->has('spotify_user_data'))
                         <div class="flex items-center gap-2">
                             @php
@@ -70,8 +80,8 @@
     </main>
 
     <!-- Minimalist Footer -->
-    <footer class="border-t border-zinc-800 mt-20">
-        <div class="max-w-7xl mx-auto px-6 py-8 text-center text-sm text-zinc-500">
+    <footer class="border-t border-zinc-200 dark:border-zinc-800 mt-20">
+        <div class="max-w-7xl mx-auto px-6 py-8 text-center text-sm text-zinc-500 dark:text-zinc-500">
             &copy; {{ date('Y') }} Music AI. Powered by Claude & Spotify.
         </div>
     </footer>
