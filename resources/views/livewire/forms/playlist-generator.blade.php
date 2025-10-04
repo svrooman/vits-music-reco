@@ -4,30 +4,30 @@
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Playlist Name</label>
             <input wire:model="name" type="text" id="name" required
                    placeholder="My Awesome Playlist"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
         </div>
 
         <div>
             <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Inspiration</label>
             <textarea wire:model="description" id="description" rows="4" required
                       placeholder="Describe what kind of music you want... (e.g., 'upbeat indie rock from the 2000s' or 'chill lo-fi beats for studying')"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
         </div>
 
         <div>
             <label for="numberOfTracks" class="block text-sm font-medium text-gray-700 mb-1">Number of Tracks</label>
             <input wire:model="numberOfTracks" type="number" id="numberOfTracks" min="1" max="50" required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
         </div>
 
         <div class="flex items-center">
             <input wire:model="isPublic" type="checkbox" id="isPublic"
-                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                   class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
             <label for="isPublic" class="ml-2 text-sm text-gray-700">Make playlist public</label>
         </div>
 
         <button type="submit" :disabled="$isLoading"
-                class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             @if($isLoading)
                 <span class="flex items-center justify-center">
                     <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

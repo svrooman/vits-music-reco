@@ -12,14 +12,14 @@
                         id="discover-prompt"
                         placeholder="What music do you want to discover?"
                         autofocus
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="type-select" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
                             <select id="type-select"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="albums" selected>Albums</option>
                                 <option value="artists">Artists</option>
                                 <option value="mixed">Mixed</option>
@@ -29,7 +29,7 @@
                         <div>
                             <label for="count-select" class="block text-sm font-medium text-gray-700 mb-1">Count</label>
                             <select id="count-select"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="5">5 items</option>
                                 <option value="10" selected>10 items</option>
                                 <option value="15">15 items</option>
@@ -40,7 +40,7 @@
 
                     <button
                         id="generate-btn"
-                        class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                        class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
                         Generate
                     </button>
                 </div>
@@ -49,7 +49,7 @@
 
         <!-- Loading State -->
         <div id="loading" class="hidden text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
             <p class="text-gray-600 mt-4">Generating recommendations...</p>
         </div>
 
@@ -66,7 +66,7 @@
                     <button
                         id="add-to-spotify-btn"
                         disabled
-                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         Add to Spotify
                     </button>
                 </div>
@@ -161,7 +161,7 @@
                     <div class="relative flex-shrink-0">
                         <input
                             type="checkbox"
-                            class="recommendation-checkbox absolute top-2 left-2 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 z-10"
+                            class="recommendation-checkbox absolute top-2 left-2 w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 z-10"
                             data-index="${index}"
                             ${!hasSpotifyData ? 'disabled' : ''}
                         />

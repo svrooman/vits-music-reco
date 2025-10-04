@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Music AI - Discover & Create' }}</title>
+    <title>{{ $title ?? 'VITS Music Recommendation' }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="min-h-screen bg-gray-50 antialiased">
+<body class="h-full flex flex-col bg-gray-50 antialiased">
     <!-- Header -->
-    <header class="bg-white border-b border-gray-200">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo/Brand -->
                 <a href="{{ route('home') }}" class="text-xl font-semibold text-gray-900">
-                    Music AI
+                    VITS Music Recommendation
                 </a>
 
                 <!-- Navigation -->
                 <nav class="flex gap-4">
                     <a href="{{ route('home') }}"
-                       class="px-3 py-2 text-sm font-medium {{ request()->routeIs('home') || request()->routeIs('playlist.*') ? 'text-primary-600' : 'text-gray-700 hover:text-gray-900' }}">
+                       class="px-3 py-2 text-sm font-medium {{ request()->routeIs('home') || request()->routeIs('playlist.*') ? 'text-indigo-600' : 'text-gray-700 hover:text-gray-900' }}">
                         Playlists
                     </a>
                     <a href="{{ route('discover.index') }}"
-                       class="px-3 py-2 text-sm font-medium {{ request()->routeIs('discover.*') ? 'text-primary-600' : 'text-gray-700 hover:text-gray-900' }}">
+                       class="px-3 py-2 text-sm font-medium {{ request()->routeIs('discover.*') ? 'text-indigo-600' : 'text-gray-700 hover:text-gray-900' }}">
                         Discover
                     </a>
                 </nav>
@@ -50,11 +50,6 @@
                                 Logout
                             </a>
                         </div>
-                    @else
-                        <a href="{{ route('spotify.auth') }}"
-                           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
-                            Connect Spotify
-                        </a>
                     @endif
                 </div>
             </div>
@@ -62,14 +57,14 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {{ $slot }}
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-gray-200 mt-20 bg-white">
+    <footer class="border-t border-gray-200 bg-white mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-500">
-            &copy; {{ date('Y') }} Music AI. Powered by Claude & Spotify.
+            &copy; {{ date('Y') }} VITS Music Recommendation. Powered by Claude & Spotify.
         </div>
     </footer>
 
