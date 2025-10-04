@@ -40,7 +40,8 @@ class AlbumRecommendationService
             }
 
             // Enrich with Spotify data (album art, availability, etc.)
-            if ($options['fetch_album_art'] && $this->spotifyService) {
+            if ($options['fetch_album_art']) {
+                Log::info("Attempting to enrich with Spotify data. SpotifyService available: " . ($this->spotifyService ? 'yes' : 'no'));
                 $recommendations = $this->enrichWithSpotifyData($recommendations, $options);
             }
 
@@ -217,7 +218,8 @@ OUTPUT FORMAT (JSON only, no other text):
     protected function enrichWithSpotifyData($recommendations, $options)
     {
         if (!$this->spotifyService) {
-            return $recommendations;
+            Log::warning("SpotifyService is null, skipping enrichment but will still try to fetch data");
+            // Don't return early - we can still use the session token
         }
 
         $enriched = [];
