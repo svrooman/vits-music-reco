@@ -5,11 +5,8 @@ import focus from '@alpinejs/focus';
 // Register Alpine plugins
 Alpine.plugin(focus);
 
-// Make Alpine available globally
+// Make Alpine available globally before it auto-starts
 window.Alpine = Alpine;
-
-// Start Alpine
-Alpine.start();
 
 // Initialize Sortable when Livewire component loads
 document.addEventListener('DOMContentLoaded', function() {
