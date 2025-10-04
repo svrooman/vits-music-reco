@@ -7,9 +7,8 @@
 
     <title>{{ $title ?? 'Music AI - Discover & Create' }}</title>
 
-    <flux:fonts />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <flux:js />
+    @wireUIScripts
 
     <style>
         body {

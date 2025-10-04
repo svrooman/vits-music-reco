@@ -2,7 +2,7 @@
     <form wire:submit="submit">
         <div class="space-y-6">
             <!-- Playlist Name -->
-            <flux:input
+            <x-input
                 wire:model="name"
                 label="Playlist Name"
                 placeholder="My Awesome Playlist"
@@ -10,7 +10,7 @@
             />
 
             <!-- Inspiration/Description -->
-            <flux:textarea
+            <x-textarea
                 wire:model="description"
                 label="Inspiration"
                 placeholder="Describe what kind of music you want... (e.g., 'upbeat indie rock from the 2000s' or 'chill lo-fi beats for studying')"
@@ -19,9 +19,8 @@
             />
 
             <!-- Number of Tracks -->
-            <flux:input
-                wire:model.number="numberOfTracks"
-                type="number"
+            <x-inputs.number
+                wire:model="numberOfTracks"
                 label="Number of Tracks"
                 min="1"
                 max="50"
@@ -29,42 +28,42 @@
             />
 
             <!-- Public Playlist Toggle -->
-            <flux:checkbox
+            <x-checkbox
                 wire:model="isPublic"
                 label="Make playlist public"
             />
 
             <!-- Submit Button -->
-            <flux:button
+            <x-button
                 type="submit"
-                variant="primary"
+                primary
                 class="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                :disabled="$isLoading">
+                :disabled="$isLoading"
+                spinner>
                 @if($isLoading)
-                    <flux:icon.loading class="w-5 h-5 mr-2" />
                     Generating Playlist...
                 @else
                     Generate Playlist
                 @endif
-            </flux:button>
+            </x-button>
         </div>
     </form>
 
     <!-- Success/Playlist Link -->
     @if($playlistId)
         <div class="mt-6">
-            <flux:card class="bg-zinc-800 border-green-500">
-                <div class="text-center py-4">
+            <div class="bg-zinc-800 border border-green-500 rounded-lg p-6">
+                <div class="text-center">
                     <p class="text-white mb-4">✨ Your playlist has been created!</p>
-                    <flux:button
+                    <x-button
                         href="https://open.spotify.com/playlist/{{ $playlistId }}"
                         target="_blank"
-                        variant="primary"
+                        primary
                         class="bg-[#1DB954] hover:bg-green-600">
                         Open in Spotify
-                    </flux:button>
+                    </x-button>
                 </div>
-            </flux:card>
+            </div>
         </div>
     @endif
 </div>

@@ -2,7 +2,7 @@
     <div class="max-w-5xl mx-auto">
         <!-- Prompt Input Section -->
         <div class="mb-12">
-            <flux:card class="bg-zinc-900/50 border-zinc-800 p-8">
+            <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-8">
                 <input
                     type="text"
                     id="discover-prompt"
@@ -12,27 +12,27 @@
                 />
 
                 <div class="flex items-center gap-4 mt-6">
-                    <flux:select id="type-select" class="flex-none">
+                    <x-select id="type-select" class="flex-none">
                         <option value="albums" selected>Albums</option>
                         <option value="artists">Artists</option>
                         <option value="mixed">Mixed</option>
-                    </flux:select>
+                    </x-select>
 
-                    <flux:select id="count-select" class="flex-none">
+                    <x-select id="count-select" class="flex-none">
                         <option value="5">5 items</option>
                         <option value="10" selected>10 items</option>
                         <option value="15">15 items</option>
                         <option value="20">20 items</option>
-                    </flux:select>
+                    </x-select>
 
-                    <flux:button
+                    <x-button
                         id="generate-btn"
-                        variant="primary"
+                        primary
                         class="ml-auto bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
                         Generate
-                    </flux:button>
+                    </x-button>
                 </div>
-            </flux:card>
+            </div>
         </div>
 
         <!-- Loading State -->
@@ -46,18 +46,18 @@
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold text-white">Recommendations</h2>
                 <div class="flex gap-3">
-                    <flux:button
+                    <x-button
                         id="select-all-btn"
-                        variant="ghost">
+                        flat>
                         Select All
-                    </flux:button>
-                    <flux:button
+                    </x-button>
+                    <x-button
                         id="add-to-spotify-btn"
-                        variant="primary"
+                        primary
                         class="bg-[#1DB954] hover:bg-green-600"
                         disabled>
                         Add to Spotify
-                    </flux:button>
+                    </x-button>
                 </div>
             </div>
 
