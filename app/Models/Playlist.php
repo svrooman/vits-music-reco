@@ -28,4 +28,12 @@ class Playlist extends Model
         'is_admin' => 'boolean',
         'tracks' => 'array',
     ];
+
+    /**
+     * Get the user that owns the playlist
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

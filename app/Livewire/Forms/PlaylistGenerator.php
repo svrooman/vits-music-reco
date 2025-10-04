@@ -75,22 +75,9 @@ class PlaylistGenerator extends Component
                 $spotifyService->addTracksToPlaylist($playlistId, $trackUris);
             }
 
-            // Get user ID
-            $userId = null;
-            if (session()->has('spotify_user_data')) {
-                $spotifyUserData = session('spotify_user_data');
-                $userId = is_object($spotifyUserData)
-                    ? ($spotifyUserData->id ?? null)
-                    : (is_array($spotifyUserData) ? ($spotifyUserData['id'] ?? null) : null);
-            }
-
-            if (!$userId) {
-                $userId = \Illuminate\Support\Str::uuid()->toString();
-            }
-
-            // Save to database
+            // Save to database (using authenticated user)
             \App\Models\Playlist::create([
-                'user_id' => $userId,
+                'user_id' => auth()->id(),
                 'name' => $this->name,
                 'description' => $this->description,
                 'spotify_playlist_id' => $playlistId,

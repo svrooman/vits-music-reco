@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'spotify_id',
     ];
 
     /**
@@ -58,5 +59,13 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    /**
+     * Get the playlists created by this user
+     */
+    public function playlists()
+    {
+        return $this->hasMany(Playlist::class);
     }
 }
