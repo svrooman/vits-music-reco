@@ -228,15 +228,26 @@ OUTPUT FORMAT (JSON only, no other text):
                 $album = $rec['album'] ?? $rec['essential_album'] ?? null;
 
                 if ($album) {
-                    // Search for album on Spotify
-                    $query = sprintf('artist:"%s" album:"%s"', addslashes($artist), addslashes($album));
+                    // Try exact search first
+                    $query = sprintf('artist:"%s" album:"%s"', $artist, $album);
 
-                    $searchResult = Http::withToken($this->spotifyService->accessToken ?? session('spotify_access_token'))
+                    $searchResult = Http::withToken(session('spotify_access_token'))
                         ->get(config('services.spotify.api_url') . '/search', [
                             'q' => $query,
                             'type' => 'album',
                             'limit' => 1
                         ])->json();
+
+                    // If no exact match, try broader search
+                    if (empty($searchResult['albums']['items'])) {
+                        $query = sprintf('%s %s', $artist, $album);
+                        $searchResult = Http::withToken(session('spotify_access_token'))
+                            ->get(config('services.spotify.api_url') . '/search', [
+                                'q' => $query,
+                                'type' => 'album',
+                                'limit' => 1
+                            ])->json();
+                    }
 
                     if (!empty($searchResult['albums']['items'])) {
                         $spotifyAlbum = $searchResult['albums']['items'][0];
