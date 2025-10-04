@@ -1,6 +1,7 @@
 import Sortable from 'sortablejs';
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';
+import '../../vendor/wire-elements/modal/resources/js/modal';
 
 // Register Alpine plugins
 Alpine.plugin(focus);
