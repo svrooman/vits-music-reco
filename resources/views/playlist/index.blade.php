@@ -32,9 +32,9 @@
                 <h2 class="text-2xl font-bold text-white mb-6">Recent Playlists</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($playlists as $playlist)
-                        <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg hover:border-purple-500 transition-all group">
+                        <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg hover:border-zinc-600 transition-all group">
                             <div class="p-5">
-                                <h3 class="text-lg font-semibold text-white truncate group-hover:text-purple-400 transition-colors">
+                                <h3 class="text-lg font-semibold text-white truncate">
                                     {{ $playlist->name }}
                                 </h3>
                                 <p class="text-zinc-400 text-sm mt-2 line-clamp-2">

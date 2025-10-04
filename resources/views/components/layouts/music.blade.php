@@ -8,13 +8,7 @@
     <title>{{ $title ?? 'Music AI - Discover & Create' }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @wireUIScripts
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+    <wireui:scripts />
 </head>
 <body class="min-h-screen bg-black text-white antialiased">
     <!-- Minimalist Header -->
@@ -23,7 +17,6 @@
             <div class="flex items-center justify-between">
                 <!-- Logo/Brand -->
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg"></div>
                     <span class="text-xl font-semibold">Music AI</span>
                 </a>
 

@@ -38,7 +38,7 @@
             <x-button
                 type="submit"
                 primary
-                class="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                class="w-full"
                 :disabled="$isLoading"
                 spinner>
                 @if($isLoading)

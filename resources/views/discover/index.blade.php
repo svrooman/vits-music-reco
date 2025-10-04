@@ -28,7 +28,7 @@
                     <x-button
                         id="generate-btn"
                         primary
-                        class="ml-auto bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                        class="ml-auto">
                         Generate
                     </x-button>
                 </div>
