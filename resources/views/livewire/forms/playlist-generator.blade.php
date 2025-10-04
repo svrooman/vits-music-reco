@@ -58,7 +58,7 @@
                                 <div class="text-sm text-gray-400">{{ $track['actual_duration'] }}</div>
                             @endif
                             <!-- View/Replace Track Button -->
-                            <button onclick="Livewire.dispatch('openModal', { component: 'modals.replace-track', arguments: { track: {{ json_encode($track) }}, trackIndex: {{ $index }}, description: '{{ addslashes($description) }}' } })" type="button"
+                            <button wire:click="$dispatch('openModal', { component: 'modals.replace-track', arguments: { track: {{ json_encode($track) }}, trackIndex: {{ $index }}, description: '{{ addslashes($description) }}' } })" type="button"
                                     class="flex-shrink-0 px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 border border-gray-300 hover:border-indigo-600 rounded transition-colors">
                                 View
                             </button>
