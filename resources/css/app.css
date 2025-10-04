@@ -2,6 +2,3 @@
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../vendor/wireui/wireui/src/View/Components/**/*.php';
-
-@custom-variant dark (&:where(.dark, .dark *))

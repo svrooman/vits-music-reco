@@ -8,22 +8,27 @@
 
         <!-- Flash Messages -->
         @if(session('success'))
-            <x-alert title="Success!" positive class="mb-6">
-                {{ session('success') }}
-            </x-alert>
+            <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+                <strong class="font-medium">Success!</strong> {{ session('success') }}
+            </div>
         @endif
 
         @if(session('error'))
-            <x-alert title="Error!" negative class="mb-6">
-                {{ session('error') }}
-            </x-alert>
+            <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                <strong class="font-medium">Error!</strong> {{ session('error') }}
+            </div>
         @endif
 
         <!-- Playlist Generation Form -->
         <div class="mb-12">
-            <x-card title="Generate Playlist">
-                @livewire('forms.playlist-generator')
-            </x-card>
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Generate Playlist</h2>
+                </div>
+                <div class="p-6">
+                    @livewire('forms.playlist-generator')
+                </div>
+            </div>
         </div>
 
         <!-- Recent Playlists -->
@@ -43,13 +48,11 @@
                                 <div class="flex mt-4 justify-between items-center">
                                     <span class="text-xs text-gray-500">{{ $playlist->created_at->format('M d, Y') }}</span>
                                     @if($playlist->spotify_playlist_id)
-                                        <x-button
-                                            href="https://open.spotify.com/playlist/{{ $playlist->spotify_playlist_id }}"
-                                            target="_blank"
-                                            xs
-                                            primary>
+                                        <a href="https://open.spotify.com/playlist/{{ $playlist->spotify_playlist_id }}"
+                                           target="_blank"
+                                           class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors">
                                             Open
-                                        </x-button>
+                                        </a>
                                     @endif
                                 </div>
                             </div>

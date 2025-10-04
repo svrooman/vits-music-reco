@@ -8,7 +8,7 @@
     <title>{{ $title ?? 'Music AI - Discover & Create' }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <wireui:scripts />
+    @livewireStyles
 </head>
 <body class="min-h-screen bg-gray-50 antialiased">
     <!-- Header -->
@@ -51,9 +51,10 @@
                             </a>
                         </div>
                     @else
-                        <x-button href="{{ route('spotify.auth') }}" primary>
+                        <a href="{{ route('spotify.auth') }}"
+                           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
                             Connect Spotify
-                        </x-button>
+                        </a>
                     @endif
                 </div>
             </div>
@@ -71,5 +72,7 @@
             &copy; {{ date('Y') }} Music AI. Powered by Claude & Spotify.
         </div>
     </footer>
+
+    @livewireScripts
 </body>
 </html>
