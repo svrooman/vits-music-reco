@@ -23,6 +23,10 @@
 
             <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <div class="max-h-96 overflow-y-auto" id="track-list">
+                    {{-- Debug: Show first track data --}}
+                    @if(count($generatedTracks) > 0)
+                        <!-- Debug: {{ json_encode(array_keys($generatedTracks[0])) }} -->
+                    @endif
                     @foreach($generatedTracks as $index => $track)
                         <div class="track-item flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}">
                             <!-- Drag Handle -->
@@ -32,11 +36,15 @@
                                 </svg>
                             </div>
                             <div class="flex-shrink-0 text-gray-400 text-sm w-6">{{ $index + 1 }}</div>
-                            @if(isset($track['album_image']))
+                            @if(isset($track['album_image']) && !empty($track['album_image']))
                                 <img src="{{ $track['album_image'] }}"
                                      alt="{{ $track['album'] ?? '' }}"
                                      class="w-10 h-10 rounded object-cover"
-                                     onerror="this.src='https://placehold.co/40x40/e5e7eb/6b7280?text={{ urlencode(substr($track['artist'], 0, 1)) }}'">
+                                     loading="eager"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="w-10 h-10 rounded bg-gray-200 hidden items-center justify-center text-gray-400 text-xs font-semibold">
+                                    {{ strtoupper(substr($track['artist'], 0, 1)) }}
+                                </div>
                             @else
                                 <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-semibold">
                                     {{ strtoupper(substr($track['artist'], 0, 1)) }}
