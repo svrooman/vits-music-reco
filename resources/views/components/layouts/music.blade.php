@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? 'VITS Music Recommendation' }}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
