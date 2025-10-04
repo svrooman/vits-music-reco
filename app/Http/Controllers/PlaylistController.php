@@ -38,8 +38,8 @@ class PlaylistController extends Controller
                                 ->json();
 
                             if (!empty($response['images'])) {
-                                // Spotify returns images in descending size order, get the smallest (last)
-                                $coverUrl = $response['images'][count($response['images']) - 1]['url'] ?? $response['images'][0]['url'];
+                                // Spotify returns images in descending size order, get the largest (first)
+                                $coverUrl = $response['images'][0]['url'];
                                 $playlist->cover_image_url = $coverUrl;
                                 $playlist->save();
                             }
