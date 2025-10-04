@@ -1,24 +1,24 @@
 <x-layouts.music title="Discover Music">
-    <div class="max-w-5xl mx-auto">
+    <div>
         <!-- Prompt Input Section -->
-        <div class="mb-12">
-            <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-8">
+        <div class="mb-8">
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
                 <input
                     type="text"
                     id="discover-prompt"
                     placeholder="What music do you want to discover?"
-                    class="w-full bg-transparent border-none text-3xl text-white placeholder-zinc-500 focus:outline-none focus:ring-0 font-light"
+                    class="w-full bg-transparent border-none text-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0"
                     autofocus
                 />
 
                 <div class="flex items-center gap-4 mt-6">
-                    <x-select id="type-select" class="flex-none">
+                    <x-select id="type-select">
                         <option value="albums" selected>Albums</option>
                         <option value="artists">Artists</option>
                         <option value="mixed">Mixed</option>
                     </x-select>
 
-                    <x-select id="count-select" class="flex-none">
+                    <x-select id="count-select">
                         <option value="5">5 items</option>
                         <option value="10" selected>10 items</option>
                         <option value="15">15 items</option>
@@ -37,14 +37,14 @@
 
         <!-- Loading State -->
         <div id="loading" class="hidden text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-            <p class="text-zinc-400 mt-4">Generating recommendations...</p>
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+            <p class="text-gray-600 mt-4">Generating recommendations...</p>
         </div>
 
         <!-- Results Section -->
         <div id="results" class="hidden">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-white">Recommendations</h2>
+                <h2 class="text-2xl font-bold text-gray-900">Recommendations</h2>
                 <div class="flex gap-3">
                     <x-button
                         id="select-all-btn"
@@ -53,8 +53,7 @@
                     </x-button>
                     <x-button
                         id="add-to-spotify-btn"
-                        primary
-                        class="bg-[#1DB954] hover:bg-green-600"
+                        positive
                         disabled>
                         Add to Spotify
                     </x-button>
@@ -140,7 +139,7 @@
         // Create recommendation card
         function createRecommendationCard(rec, index) {
             const div = document.createElement('div');
-            div.className = 'bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden hover:border-purple-500 transition-all cursor-pointer group';
+            div.className = 'bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition-all cursor-pointer group';
 
             const hasSpotifyData = rec.spotify_data?.available;
             const imageUrl = rec.spotify_data?.image || 'https://via.placeholder.com/300x300?text=No+Image';
@@ -150,7 +149,7 @@
                     <div class="relative flex-shrink-0">
                         <input
                             type="checkbox"
-                            class="recommendation-checkbox absolute top-2 left-2 w-5 h-5 rounded border-zinc-600 text-purple-500 focus:ring-purple-500 focus:ring-offset-zinc-900 z-10"
+                            class="recommendation-checkbox absolute top-2 left-2 w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 z-10"
                             data-index="${index}"
                             ${!hasSpotifyData ? 'disabled' : ''}
                         />
@@ -168,11 +167,11 @@
                         ` : ''}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="text-white font-semibold truncate">${rec.artist}</h3>
-                        <p class="text-zinc-400 text-sm truncate">${rec.album || rec.essential_album || 'Various'}</p>
-                        ${rec.year ? `<p class="text-zinc-500 text-xs mt-1">${rec.year}${rec.genre ? ' • ' + rec.genre : ''}</p>` : ''}
-                        ${rec.reason ? `<p class="text-zinc-400 text-xs mt-2 line-clamp-2">${rec.reason}</p>` : ''}
-                        ${!hasSpotifyData ? `<span class="inline-block mt-2 px-2 py-1 bg-zinc-800 text-zinc-500 text-xs rounded">Not on Spotify</span>` : ''}
+                        <h3 class="text-gray-900 font-semibold truncate">${rec.artist}</h3>
+                        <p class="text-gray-600 text-sm truncate">${rec.album || rec.essential_album || 'Various'}</p>
+                        ${rec.year ? `<p class="text-gray-500 text-xs mt-1">${rec.year}${rec.genre ? ' • ' + rec.genre : ''}</p>` : ''}
+                        ${rec.reason ? `<p class="text-gray-600 text-xs mt-2 line-clamp-2">${rec.reason}</p>` : ''}
+                        ${!hasSpotifyData ? `<span class="inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">Not on Spotify</span>` : ''}
                     </div>
                 </div>
             `;

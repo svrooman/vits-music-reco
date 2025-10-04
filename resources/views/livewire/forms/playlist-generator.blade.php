@@ -53,14 +53,13 @@
     <!-- Success/Playlist Link -->
     @if($playlistId)
         <div class="mt-6">
-            <div class="bg-zinc-800 border border-green-500 rounded-lg p-6">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6">
                 <div class="text-center">
-                    <p class="text-white mb-4">✨ Your playlist has been created!</p>
+                    <p class="text-gray-900 mb-4">✨ Your playlist has been created!</p>
                     <x-button
                         href="https://open.spotify.com/playlist/{{ $playlistId }}"
                         target="_blank"
-                        primary
-                        class="bg-[#1DB954] hover:bg-green-600">
+                        positive>
                         Open in Spotify
                     </x-button>
                 </div>
