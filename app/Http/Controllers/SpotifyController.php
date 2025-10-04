@@ -40,6 +40,8 @@ class SpotifyController extends Controller
                 'playlist-modify-public',
                 'user-read-email',
                 'user-read-private',
+                'user-library-modify',
+                'user-library-read',
             ],
         ];
 
