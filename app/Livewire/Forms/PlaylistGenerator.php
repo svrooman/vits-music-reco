@@ -12,7 +12,6 @@ class PlaylistGenerator extends Component
     public $numberOfTracks = 25;
     public $isPublic = false;
     public $description = '';
-    public $isLoading = false;
     public $playlistId = null;
     public $generatedTracks = [];
     public $showPreview = false;
@@ -31,8 +30,6 @@ class PlaylistGenerator extends Component
             session()->flash('error', 'Please authenticate with Spotify first');
             return redirect()->route('spotify.auth');
         }
-
-        $this->isLoading = true;
 
         try {
             // Initialize services
@@ -54,8 +51,6 @@ class PlaylistGenerator extends Component
 
         } catch (\Exception $e) {
             session()->flash('error', 'Error: ' . $e->getMessage());
-        } finally {
-            $this->isLoading = false;
         }
     }
 
@@ -64,8 +59,6 @@ class PlaylistGenerator extends Component
         if (empty($this->generatedTracks)) {
             return;
         }
-
-        $this->isLoading = true;
 
         try {
             // Create playlist on Spotify
@@ -119,8 +112,6 @@ class PlaylistGenerator extends Component
 
         } catch (\Exception $e) {
             session()->flash('error', 'Error: ' . $e->getMessage());
-        } finally {
-            $this->isLoading = false;
         }
     }
 

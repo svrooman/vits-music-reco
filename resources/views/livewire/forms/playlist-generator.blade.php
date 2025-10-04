@@ -1,14 +1,16 @@
 <div>
     <!-- Loading State -->
-    @if($isLoading)
-        <div class="text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
-            <p class="text-gray-600 mt-4">{{ $showPreview ? 'Creating playlist...' : 'Generating tracks...' }}</p>
-        </div>
-    @endif
+    <div wire:loading class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+        <p class="text-gray-600 mt-4">
+            <span wire:loading.delay wire:target="submit">Generating tracks...</span>
+            <span wire:loading.delay wire:target="createPlaylist">Creating playlist...</span>
+        </p>
+    </div>
 
     <!-- Track Preview -->
-    @if($showPreview && !$isLoading)
+    <div wire:loading.remove>
+    @if($showPreview)
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-gray-900">Generated Tracks ({{ count($generatedTracks) }})</h3>
@@ -56,9 +58,11 @@
             </div>
         </div>
     @endif
+    </div>
 
     <!-- Form -->
-    @if(!$showPreview && !$isLoading)
+    <div wire:loading.remove>
+    @if(!$showPreview)
     <form wire:submit="submit" class="space-y-4">
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Playlist Name</label>
@@ -92,6 +96,7 @@
         </button>
     </form>
     @endif
+    </div>
 
     @if($playlistId)
         <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
