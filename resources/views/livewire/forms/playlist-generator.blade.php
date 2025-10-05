@@ -29,76 +29,33 @@
                     @endif
                     @foreach($generatedTracks as $index => $track)
                         <div class="track-item relative border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}">
-                            <div class="flex items-start gap-3 p-3">
-                                <div class="flex items-center gap-3 flex-1 min-w-0">
-                                {{-- Play/Pause Button - Commented out until we get preview URLs working --}}
-                                {{-- @if(!empty($track['preview_url']))
-                                <button class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors" data-play-button>
-                                    <!-- Play Icon -->
-                                    <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20" data-play-icon>
-                                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
-                                    </svg>
-                                    <!-- Pause Icon (hidden by default) -->
-                                    <svg class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 20 20" data-pause-icon>
-                                        <path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/>
-                                    </svg>
-                                </button>
-                                @else
-                                <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 text-gray-500" title="No preview available">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/>
-                                    </svg>
-                                </div>
-                                @endif --}}
-
+                            <div class="flex items-center gap-3 p-3">
                                 <!-- Drag Handle -->
                                 <div class="drag-handle flex-shrink-0 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"/>
                                     </svg>
                                 </div>
-                                <div class="flex-shrink-0 text-gray-400 text-sm w-6">{{ $index + 1 }}</div>
-                            @if(isset($track['album_image']) && !empty($track['album_image']))
-                                <img src="{{ $track['album_image'] }}"
-                                     alt="{{ $track['album'] ?? '' }}"
-                                     class="w-10 h-10 rounded object-cover"
-                                     loading="eager"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="w-10 h-10 rounded bg-gray-200 hidden items-center justify-center text-gray-400 text-xs font-semibold">
-                                    {{ strtoupper(substr($track['artist'], 0, 1)) }}
-                                </div>
-                            @else
-                                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-semibold">
-                                    {{ strtoupper(substr($track['artist'], 0, 1)) }}
-                                </div>
-                            @endif
-                            <div class="flex-1 min-w-0">
-                                <div class="font-medium text-gray-900 truncate">{{ $track['track'] }}</div>
-                                <div class="text-sm text-gray-500 truncate">{{ $track['artist'] }} • {{ $track['album'] ?? 'Unknown Album' }}</div>
-                            </div>
-                                    @if(isset($track['actual_duration']))
-                                        <div class="text-sm text-gray-400">{{ $track['actual_duration'] }}</div>
-                                    @endif
-                                    <!-- View/Replace Track Button -->
-                                    <button wire:click="$dispatch('openModal', { component: 'modals.replace-track', arguments: { track: {{ json_encode($track) }}, trackIndex: {{ $index }}, description: '{{ addslashes($description) }}' } })" type="button"
-                                            class="flex-shrink-0 px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 border border-gray-300 hover:border-indigo-600 rounded transition-colors">
-                                        View
-                                    </button>
-                                </div>
-                            </div>
 
-                            <!-- Spotify Embed Player -->
-                            @if(!empty($track['spotify_id']))
-                            <div class="px-3 pb-3">
-                                <iframe src="https://open.spotify.com/embed/track/{{ $track['spotify_id'] }}"
-                                        width="100%"
-                                        height="80"
-                                        frameborder="0"
-                                        allowtransparency="true"
-                                        allow="encrypted-media"
-                                        class="rounded"></iframe>
+                                <!-- Spotify Embed Player -->
+                                @if(!empty($track['spotify_id']))
+                                <div class="flex-1">
+                                    <iframe src="https://open.spotify.com/embed/track/{{ $track['spotify_id'] }}"
+                                            width="100%"
+                                            height="80"
+                                            frameborder="0"
+                                            allowtransparency="true"
+                                            allow="encrypted-media"
+                                            class="rounded"></iframe>
+                                </div>
+                                @endif
+
+                                <!-- View/Replace Track Button -->
+                                <button wire:click="$dispatch('openModal', { component: 'modals.replace-track', arguments: { track: {{ json_encode($track) }}, trackIndex: {{ $index }}, description: '{{ addslashes($description) }}' } })" type="button"
+                                        class="flex-shrink-0 px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 border border-gray-300 hover:border-indigo-600 rounded transition-colors">
+                                    View
+                                </button>
                             </div>
-                            @endif
                         </div>
                     @endforeach
                 </div>
