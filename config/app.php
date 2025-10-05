@@ -123,4 +123,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'passwords' => [
+        'admin' => env('PASSWORD_ADMIN', 'VitsMusic2025!SecureAdmin#'),
+    ],
+
 ];
