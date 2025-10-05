@@ -34,8 +34,8 @@
 
                             <!-- Content wrapper with higher z-index -->
                             <div class="relative z-10 flex items-center gap-3 w-full">
-                                <!-- Play/Pause Button -->
-                                @if(!empty($track['preview_url']))
+                                {{-- Play/Pause Button - Commented out until we get preview URLs working --}}
+                                {{-- @if(!empty($track['preview_url']))
                                 <button class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors" data-play-button>
                                     <!-- Play Icon -->
                                     <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20" data-play-icon>
@@ -52,7 +52,7 @@
                                         <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/>
                                     </svg>
                                 </div>
-                                @endif
+                                @endif --}}
 
                                 <!-- Drag Handle -->
                                 <div class="drag-handle flex-shrink-0 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600">
