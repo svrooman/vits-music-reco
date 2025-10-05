@@ -28,12 +28,9 @@
                         <!-- Debug: {{ json_encode(array_keys($generatedTracks[0])) }} -->
                     @endif
                     @foreach($generatedTracks as $index => $track)
-                        <div class="track-item relative flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 overflow-hidden" data-index="{{ $index }}" data-preview-url="{{ $track['preview_url'] ?? '' }}">
-                            <!-- Progress bar background -->
-                            <div class="absolute inset-0 bg-indigo-100 origin-left transform scale-x-0 transition-transform duration-100" style="z-index: 0;" data-progress-bar></div>
-
-                            <!-- Content wrapper with higher z-index -->
-                            <div class="relative z-10 flex items-center gap-3 w-full">
+                        <div class="track-item relative border-b border-gray-100 last:border-b-0 hover:bg-gray-50" data-index="{{ $index }}">
+                            <div class="flex items-start gap-3 p-3">
+                                <div class="flex items-center gap-3 flex-1 min-w-0">
                                 {{-- Play/Pause Button - Commented out until we get preview URLs working --}}
                                 {{-- @if(!empty($track['preview_url']))
                                 <button class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors" data-play-button>
@@ -79,15 +76,29 @@
                                 <div class="font-medium text-gray-900 truncate">{{ $track['track'] }}</div>
                                 <div class="text-sm text-gray-500 truncate">{{ $track['artist'] }} • {{ $track['album'] ?? 'Unknown Album' }}</div>
                             </div>
-                            @if(isset($track['actual_duration']))
-                                <div class="text-sm text-gray-400">{{ $track['actual_duration'] }}</div>
-                            @endif
-                                <!-- View/Replace Track Button -->
-                                <button wire:click="$dispatch('openModal', { component: 'modals.replace-track', arguments: { track: {{ json_encode($track) }}, trackIndex: {{ $index }}, description: '{{ addslashes($description) }}' } })" type="button"
-                                        class="flex-shrink-0 px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 border border-gray-300 hover:border-indigo-600 rounded transition-colors">
-                                    View
-                                </button>
+                                    @if(isset($track['actual_duration']))
+                                        <div class="text-sm text-gray-400">{{ $track['actual_duration'] }}</div>
+                                    @endif
+                                    <!-- View/Replace Track Button -->
+                                    <button wire:click="$dispatch('openModal', { component: 'modals.replace-track', arguments: { track: {{ json_encode($track) }}, trackIndex: {{ $index }}, description: '{{ addslashes($description) }}' } })" type="button"
+                                            class="flex-shrink-0 px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 border border-gray-300 hover:border-indigo-600 rounded transition-colors">
+                                        View
+                                    </button>
+                                </div>
                             </div>
+
+                            <!-- Spotify Embed Player -->
+                            @if(!empty($track['spotify_id']))
+                            <div class="px-3 pb-3">
+                                <iframe src="https://open.spotify.com/embed/track/{{ $track['spotify_id'] }}"
+                                        width="100%"
+                                        height="80"
+                                        frameborder="0"
+                                        allowtransparency="true"
+                                        allow="encrypted-media"
+                                        class="rounded"></iframe>
+                            </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>
