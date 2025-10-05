@@ -450,7 +450,9 @@ No explanations or additional text, just the JSON array.";
 
                 logger()->info('Track validated with Spotify data', [
                     'track' => $track['track'],
-                    'has_image' => !empty($track['album_image'])
+                    'has_image' => !empty($track['album_image']),
+                    'has_preview' => !empty($track['preview_url']),
+                    'preview_url' => $track['preview_url']
                 ]);
 
                 $validatedTracks[] = $track;
