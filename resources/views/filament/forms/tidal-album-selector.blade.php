@@ -41,6 +41,15 @@
                         ? date('Y', strtotime($match['attributes']['releaseDate']))
                         : '';
 
+                    // Get artist names
+                    $artistNames = [];
+                    if (!empty($match['artists'])) {
+                        foreach ($match['artists'] as $artist) {
+                            $artistNames[] = $artist['attributes']['name'] ?? '';
+                        }
+                    }
+                    $artistsText = !empty($artistNames) ? implode(', ', array_filter($artistNames)) : '';
+
                     // Get album artwork from attached coverArt data
                     $imageUrl = null;
 
@@ -86,6 +95,9 @@
                         <div class="flex items-start justify-between gap-2">
                             <div class="flex-1 min-w-0">
                                 <h4 class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ $title }}</h4>
+                                @if($artistsText)
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ $artistsText }}</p>
+                                @endif
                                 @if($releaseDate)
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ $releaseDate }}</p>
                                 @endif

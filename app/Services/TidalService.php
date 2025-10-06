@@ -153,18 +153,21 @@ class TidalService
             ])
             ->get($url, [
                 'countryCode' => 'US',
-                'include' => 'albums,albums.coverArt',
+                'include' => 'albums,albums.coverArt,albums.artists',
             ]);
 
         if ($response->successful()) {
             $data = $response->json();
 
-            // Build a map of artworks by ID from included resources
+            // Build maps of included resources by ID
             $artworkMap = [];
+            $artistMap = [];
             if (!empty($data['included'])) {
                 foreach ($data['included'] as $item) {
                     if (isset($item['type']) && $item['type'] === 'artworks') {
                         $artworkMap[$item['id']] = $item;
+                    } elseif (isset($item['type']) && $item['type'] === 'artists') {
+                        $artistMap[$item['id']] = $item;
                     }
                 }
             }
@@ -181,6 +184,17 @@ class TidalService
                                 $item['coverArt'] = $artworkMap[$artworkId];
                             }
                         }
+
+                        // Attach artists data if available
+                        if (!empty($item['relationships']['artists']['data'])) {
+                            $item['artists'] = [];
+                            foreach ($item['relationships']['artists']['data'] as $artistRef) {
+                                if (isset($artistMap[$artistRef['id']])) {
+                                    $item['artists'][] = $artistMap[$artistRef['id']];
+                                }
+                            }
+                        }
+
                         $albums[] = $item;
                     }
                 }
