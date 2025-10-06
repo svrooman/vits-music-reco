@@ -32,25 +32,38 @@ class TidalController extends Controller
         $code = $request->get('code');
 
         if (!$code) {
+            \Log::error('Tidal callback: No code received');
             return redirect('/admin/discovered-albums')
-                ->with('error', 'Tidal authorization failed');
+                ->with('error', 'Tidal authorization failed - no code');
         }
 
         // Exchange code for access token
         $tokenData = $this->tidalService->getAccessToken($code);
 
         if (!$tokenData) {
+            \Log::error('Tidal callback: Failed to get access token');
             return redirect('/admin/discovered-albums')
                 ->with('error', 'Failed to get Tidal access token');
         }
 
+        \Log::info('Tidal callback: Got token data', ['has_access_token' => !empty($tokenData['access_token'])]);
+
         // Store tokens in user model
         $user = Auth::user();
+
+        if (!$user) {
+            \Log::error('Tidal callback: No authenticated user');
+            return redirect('/admin/discovered-albums')
+                ->with('error', 'Not authenticated');
+        }
+
         $user->update([
             'tidal_access_token' => $tokenData['access_token'],
             'tidal_refresh_token' => $tokenData['refresh_token'] ?? null,
             'tidal_expires_at' => now()->addSeconds($tokenData['expires_in']),
         ]);
+
+        \Log::info('Tidal callback: Tokens stored for user', ['user_id' => $user->id]);
 
         return redirect('/admin/discovered-albums')
             ->with('success', 'Connected to Tidal successfully!');

@@ -28,11 +28,13 @@ Route::get('/spotify/logout', [SpotifyController::class, 'logout'])->name('spoti
 Route::get('/spotify/token', [SpotifyController::class, 'getAccessToken'])->name('spotify.token');
 
 // Tidal OAuth routes
-Route::get('/tidal/auth', [TidalController::class, 'redirectToTidal'])->name('tidal.auth');
-Route::get('/tidal/callback', [TidalController::class, 'handleTidalCallback'])->name('tidal.callback');
-Route::get('/tidal/check-auth', [TidalController::class, 'checkAuth'])->name('tidal.checkAuth');
-Route::get('/tidal/logout', [TidalController::class, 'logout'])->name('tidal.logout');
-Route::get('/tidal/token', [TidalController::class, 'getAccessToken'])->name('tidal.token');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/tidal/auth', [TidalController::class, 'redirectToTidal'])->name('tidal.auth');
+    Route::get('/tidal/callback', [TidalController::class, 'handleTidalCallback'])->name('tidal.callback');
+    Route::get('/tidal/check-auth', [TidalController::class, 'checkAuth'])->name('tidal.checkAuth');
+    Route::get('/tidal/logout', [TidalController::class, 'logout'])->name('tidal.logout');
+    Route::get('/tidal/token', [TidalController::class, 'getAccessToken'])->name('tidal.token');
+});
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
