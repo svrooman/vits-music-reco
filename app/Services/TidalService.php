@@ -133,20 +133,23 @@ class TidalService
      */
     public function searchAlbum(string $artist, string $album, string $accessToken): ?array
     {
-        $query = "{$artist} {$album}";
+        $query = "{$artist} - {$album}";
+        $encodedQuery = urlencode($query);
+
+        $url = "{$this->apiUrl}/v2/searchResults/{$encodedQuery}";
 
         \Log::info('Tidal: Searching for album', [
             'query' => $query,
-            'url' => "{$this->apiUrl}/v2/searchResults/top-hits",
+            'url' => $url,
         ]);
 
         $response = Http::withToken($accessToken)
             ->withHeaders([
-                'Accept' => 'application/vnd.tidal.v1+json',
+                'Accept' => 'application/vnd.api+json',
             ])
-            ->get("{$this->apiUrl}/v2/searchResults/top-hits", [
-                'query' => $query,
+            ->get($url, [
                 'countryCode' => 'US',
+                'include' => 'albums',
             ]);
 
         \Log::info('Tidal: Search response', [
@@ -158,19 +161,21 @@ class TidalService
         if ($response->successful()) {
             $data = $response->json();
 
-            // Check for albums in response
-            if (!empty($data['albums'])) {
-                \Log::info('Tidal: Found albums', ['count' => count($data['albums'])]);
-                return $data['albums'][0];
+            // Tidal API returns data in JSON:API format
+            if (!empty($data['albums']['data'])) {
+                \Log::info('Tidal: Found albums', ['count' => count($data['albums']['data'])]);
+                return $data['albums']['data'][0];
             }
 
             if (!empty($data['data'])) {
+                \Log::info('Tidal: Found data', ['count' => count($data['data'])]);
+                // Find first album type
                 foreach ($data['data'] as $item) {
-                    if ($item['type'] === 'album' || isset($item['resource']['album'])) {
-                        \Log::info('Tidal: Found album in data');
-                        return $item['resource'] ?? $item;
+                    if (isset($item['type']) && $item['type'] === 'albums') {
+                        return $item;
                     }
                 }
+                return $data['data'][0];
             }
 
             \Log::warning('Tidal: No albums found in response', ['keys' => array_keys($data)]);
