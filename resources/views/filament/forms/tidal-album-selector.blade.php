@@ -41,25 +41,22 @@
                         ? date('Y', strtotime($match['attributes']['releaseDate']))
                         : '';
 
-                    // Get album artwork - try multiple sources
+                    // Get album artwork from attached coverArt data
                     $imageUrl = null;
 
-                    // First try the attached coverArt data
                     if (isset($match['coverArt']['attributes']['files'])) {
-                        // Get the largest image file
+                        // Find 640x640 image or fallback to largest
                         $files = $match['coverArt']['attributes']['files'];
-                        usort($files, function($a, $b) {
-                            $widthA = $a['meta']['width'] ?? 0;
-                            $widthB = $b['meta']['width'] ?? 0;
-                            return $widthB - $widthA;
-                        });
-                        $imageUrl = $files[0]['href'] ?? null;
-                    }
-
-                    // Fallback: construct URL from coverArt ID
-                    if (!$imageUrl && isset($match['relationships']['coverArt']['data'][0]['id'])) {
-                        $artworkId = $match['relationships']['coverArt']['data'][0]['id'];
-                        $imageUrl = "https://resources.tidal.com/images/" . str_replace('-', '/', $artworkId) . "/750x750.jpg";
+                        foreach ($files as $file) {
+                            if (isset($file['meta']['width']) && $file['meta']['width'] === 640) {
+                                $imageUrl = $file['href'];
+                                break;
+                            }
+                        }
+                        // Fallback to first (largest) if 640 not found
+                        if (!$imageUrl && !empty($files)) {
+                            $imageUrl = $files[0]['href'];
+                        }
                     }
                 @endphp
 
