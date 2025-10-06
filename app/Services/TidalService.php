@@ -135,20 +135,37 @@ class TidalService
     {
         $query = "{$artist} {$album}";
 
+        \Log::info('Tidal: Searching for album', [
+            'query' => $query,
+            'url' => "{$this->apiUrl}/search/albums",
+        ]);
+
         $response = Http::withToken($accessToken)
-            ->get("{$this->apiUrl}/search", [
+            ->withHeaders([
+                'Accept' => 'application/vnd.tidal.v1+json',
+            ])
+            ->get("{$this->apiUrl}/search/albums", [
                 'query' => $query,
-                'type' => 'ALBUMS',
-                'limit' => 5,
                 'countryCode' => 'US',
+                'limit' => 10,
             ]);
+
+        \Log::info('Tidal: Search response', [
+            'status' => $response->status(),
+            'successful' => $response->successful(),
+            'body' => $response->body(),
+        ]);
 
         if ($response->successful()) {
             $data = $response->json();
 
             // Return the best match if found
-            if (!empty($data['albums']['items'])) {
-                return $data['albums']['items'][0];
+            if (!empty($data['albums'])) {
+                return $data['albums'][0];
+            }
+
+            if (!empty($data['data'])) {
+                return $data['data'][0];
             }
         }
 
