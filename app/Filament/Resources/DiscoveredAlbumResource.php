@@ -176,6 +176,7 @@ class DiscoveredAlbumResource extends Resource
                             $record->update([
                                 'tidal_added' => true,
                                 'tidal_added_at' => now(),
+                                'tidal_album_id' => $data['album_id'],
                             ]);
 
                             Notification::make()
@@ -191,6 +192,22 @@ class DiscoveredAlbumResource extends Resource
                                 ->send();
                         }
                     }),
+                Tables\Actions\Action::make('viewOnTidal')
+                    ->label('View on Tidal')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->hidden(fn ($record) => !$record->tidal_added)
+                    ->url(function ($record) {
+                        // If we have the album ID, link directly to the album
+                        if ($record->tidal_album_id) {
+                            return "https://listen.tidal.com/album/{$record->tidal_album_id}";
+                        }
+
+                        // Fallback to search if no album ID stored
+                        $query = urlencode("{$record->artist} {$record->album}");
+                        return "https://listen.tidal.com/search?q={$query}";
+                    })
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -234,6 +251,7 @@ class DiscoveredAlbumResource extends Resource
                                         $record->update([
                                             'tidal_added' => true,
                                             'tidal_added_at' => now(),
+                                            'tidal_album_id' => $result['tidal_album']['id'] ?? null,
                                         ]);
                                         $added++;
                                     } else {
