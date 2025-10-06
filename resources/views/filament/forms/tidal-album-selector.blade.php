@@ -41,16 +41,26 @@
                         ? date('Y', strtotime($match['attributes']['releaseDate']))
                         : '';
 
-                    // Get album artwork from relationships
-                    $artworkId = null;
-                    if (isset($match['relationships']['coverArt']['data'][0]['id'])) {
-                        $artworkId = $match['relationships']['coverArt']['data'][0]['id'];
+                    // Get album artwork - try multiple sources
+                    $imageUrl = null;
+
+                    // First try the attached coverArt data
+                    if (isset($match['coverArt']['attributes']['files'])) {
+                        // Get the largest image file
+                        $files = $match['coverArt']['attributes']['files'];
+                        usort($files, function($a, $b) {
+                            $widthA = $a['meta']['width'] ?? 0;
+                            $widthB = $b['meta']['width'] ?? 0;
+                            return $widthB - $widthA;
+                        });
+                        $imageUrl = $files[0]['href'] ?? null;
                     }
 
-                    // Construct Tidal image URL (standard format)
-                    $imageUrl = $artworkId
-                        ? "https://resources.tidal.com/images/" . str_replace('-', '/', $artworkId) . "/750x750.jpg"
-                        : null;
+                    // Fallback: construct URL from coverArt ID
+                    if (!$imageUrl && isset($match['relationships']['coverArt']['data'][0]['id'])) {
+                        $artworkId = $match['relationships']['coverArt']['data'][0]['id'];
+                        $imageUrl = "https://resources.tidal.com/images/" . str_replace('-', '/', $artworkId) . "/750x750.jpg";
+                    }
                 @endphp
 
                 <div @click="selectAlbum('{{ $matchId }}')"

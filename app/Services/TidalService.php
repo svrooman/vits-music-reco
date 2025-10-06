@@ -153,17 +153,34 @@ class TidalService
             ])
             ->get($url, [
                 'countryCode' => 'US',
-                'include' => 'albums',
+                'include' => 'albums,albums.coverArt',
             ]);
 
         if ($response->successful()) {
             $data = $response->json();
+
+            // Build a map of coverArt by ID from included resources
+            $coverArtMap = [];
+            if (!empty($data['included'])) {
+                foreach ($data['included'] as $item) {
+                    if (isset($item['type']) && $item['type'] === 'images') {
+                        $coverArtMap[$item['id']] = $item;
+                    }
+                }
+            }
 
             // Tidal API returns albums in the 'included' array (JSON:API format)
             if (!empty($data['included'])) {
                 $albums = [];
                 foreach ($data['included'] as $item) {
                     if (isset($item['type']) && $item['type'] === 'albums') {
+                        // Attach coverArt data if available
+                        if (!empty($item['relationships']['coverArt']['data'][0]['id'])) {
+                            $coverArtId = $item['relationships']['coverArt']['data'][0]['id'];
+                            if (isset($coverArtMap[$coverArtId])) {
+                                $item['coverArt'] = $coverArtMap[$coverArtId];
+                            }
+                        }
                         $albums[] = $item;
                     }
                 }
