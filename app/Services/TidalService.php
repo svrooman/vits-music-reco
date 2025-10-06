@@ -137,36 +137,43 @@ class TidalService
 
         \Log::info('Tidal: Searching for album', [
             'query' => $query,
-            'url' => "{$this->apiUrl}/search/albums",
+            'url' => "{$this->apiUrl}/v2/searchresults/top-hits",
         ]);
 
         $response = Http::withToken($accessToken)
             ->withHeaders([
                 'Accept' => 'application/vnd.tidal.v1+json',
             ])
-            ->get("{$this->apiUrl}/search/albums", [
+            ->get("{$this->apiUrl}/v2/searchresults/top-hits", [
                 'query' => $query,
                 'countryCode' => 'US',
-                'limit' => 10,
             ]);
 
         \Log::info('Tidal: Search response', [
             'status' => $response->status(),
             'successful' => $response->successful(),
-            'body' => $response->body(),
+            'body' => substr($response->body(), 0, 500),
         ]);
 
         if ($response->successful()) {
             $data = $response->json();
 
-            // Return the best match if found
+            // Check for albums in response
             if (!empty($data['albums'])) {
+                \Log::info('Tidal: Found albums', ['count' => count($data['albums'])]);
                 return $data['albums'][0];
             }
 
             if (!empty($data['data'])) {
-                return $data['data'][0];
+                foreach ($data['data'] as $item) {
+                    if ($item['type'] === 'album' || isset($item['resource']['album'])) {
+                        \Log::info('Tidal: Found album in data');
+                        return $item['resource'] ?? $item;
+                    }
+                }
             }
+
+            \Log::warning('Tidal: No albums found in response', ['keys' => array_keys($data)]);
         }
 
         return null;
