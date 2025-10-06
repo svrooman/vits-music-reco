@@ -26,6 +26,9 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'spotify_id',
+        'tidal_access_token',
+        'tidal_refresh_token',
+        'tidal_expires_at',
     ];
 
     /**
@@ -48,6 +51,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'tidal_expires_at' => 'datetime',
         ];
     }
 

@@ -5,13 +5,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DiscoveredAlbumResource\Pages;
 use App\Filament\Resources\DiscoveredAlbumResource\RelationManagers;
 use App\Models\DiscoveredAlbum;
+use App\Services\TidalService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class DiscoveredAlbumResource extends Resource
 {
@@ -106,11 +109,49 @@ class DiscoveredAlbumResource extends Resource
                     ->hidden(fn ($record) => $record->tidal_added)
                     ->requiresConfirmation()
                     ->action(function ($record) {
-                        // TODO: Implement Tidal OAuth and add logic
-                        $record->update([
-                            'tidal_added' => true,
-                            'tidal_added_at' => now(),
-                        ]);
+                        $user = Auth::user();
+
+                        // Check if user is authenticated with Tidal
+                        if (!$user->tidal_access_token) {
+                            Notification::make()
+                                ->title('Connect to Tidal first')
+                                ->warning()
+                                ->body('Please connect your Tidal account before adding albums.')
+                                ->actions([
+                                    \Filament\Notifications\Actions\Action::make('connect')
+                                        ->button()
+                                        ->url(route('tidal.auth')),
+                                ])
+                                ->send();
+                            return;
+                        }
+
+                        // Add to Tidal
+                        $tidalService = app(TidalService::class);
+                        $result = $tidalService->searchAndAddAlbum(
+                            $record->artist,
+                            $record->album,
+                            $user->tidal_access_token
+                        );
+
+                        if ($result['success']) {
+                            $record->update([
+                                'tidal_added' => true,
+                                'tidal_added_at' => now(),
+                            ]);
+
+                            Notification::make()
+                                ->title('Added to Tidal')
+                                ->success()
+                                ->body($result['message'])
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Failed to add to Tidal')
+                                ->danger()
+                                ->body($result['message'])
+                                ->send();
+                        }
                     }),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -123,15 +164,51 @@ class DiscoveredAlbumResource extends Resource
                         ->color('success')
                         ->requiresConfirmation()
                         ->action(function ($records) {
+                            $user = Auth::user();
+
+                            if (!$user->tidal_access_token) {
+                                Notification::make()
+                                    ->title('Connect to Tidal first')
+                                    ->warning()
+                                    ->body('Please connect your Tidal account.')
+                                    ->actions([
+                                        \Filament\Notifications\Actions\Action::make('connect')
+                                            ->button()
+                                            ->url(route('tidal.auth')),
+                                    ])
+                                    ->send();
+                                return;
+                            }
+
+                            $tidalService = app(TidalService::class);
+                            $added = 0;
+                            $failed = 0;
+
                             foreach ($records as $record) {
                                 if (!$record->tidal_added) {
-                                    // TODO: Implement Tidal OAuth and add logic
-                                    $record->update([
-                                        'tidal_added' => true,
-                                        'tidal_added_at' => now(),
-                                    ]);
+                                    $result = $tidalService->searchAndAddAlbum(
+                                        $record->artist,
+                                        $record->album,
+                                        $user->tidal_access_token
+                                    );
+
+                                    if ($result['success']) {
+                                        $record->update([
+                                            'tidal_added' => true,
+                                            'tidal_added_at' => now(),
+                                        ]);
+                                        $added++;
+                                    } else {
+                                        $failed++;
+                                    }
                                 }
                             }
+
+                            Notification::make()
+                                ->title('Bulk add complete')
+                                ->success()
+                                ->body("Added {$added} albums to Tidal. {$failed} failed.")
+                                ->send();
                         }),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),

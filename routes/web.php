@@ -3,6 +3,7 @@
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\DiscoverController;
 use App\Http\Controllers\SpotifyController;
+use App\Http\Controllers\TidalController;
 use App\Http\Controllers\Api\PlaylistController as ApiPlaylistController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -25,6 +26,13 @@ Route::get('/spotify/create-playlist', [SpotifyController::class, 'createPlaylis
 Route::get('/spotify/check-auth', [SpotifyController::class, 'checkAuth'])->name('spotify.checkAuth');
 Route::get('/spotify/logout', [SpotifyController::class, 'logout'])->name('spotify.logout');
 Route::get('/spotify/token', [SpotifyController::class, 'getAccessToken'])->name('spotify.token');
+
+// Tidal OAuth routes
+Route::get('/tidal/auth', [TidalController::class, 'redirectToTidal'])->name('tidal.auth');
+Route::get('/tidal/callback', [TidalController::class, 'handleTidalCallback'])->name('tidal.callback');
+Route::get('/tidal/check-auth', [TidalController::class, 'checkAuth'])->name('tidal.checkAuth');
+Route::get('/tidal/logout', [TidalController::class, 'logout'])->name('tidal.logout');
+Route::get('/tidal/token', [TidalController::class, 'getAccessToken'])->name('tidal.token');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

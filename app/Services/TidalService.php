@@ -25,11 +25,24 @@ class TidalService
      */
     public function getAuthUrl(): string
     {
+        $scopes = [
+            'user.read',
+            'collection.read',
+            'collection.write',
+            'search.read',
+            'playlists.read',
+            'playlists.write',
+            'entitlements.read',
+            'playback',
+            'recommendations.read',
+            'search.write',
+        ];
+
         $params = http_build_query([
             'response_type' => 'code',
             'client_id' => $this->clientId,
             'redirect_uri' => $this->redirectUri,
-            'scope' => 'r_usr w_usr', // read user data, write user data
+            'scope' => implode(' ', $scopes),
         ]);
 
         return "https://login.tidal.com/authorize?{$params}";
