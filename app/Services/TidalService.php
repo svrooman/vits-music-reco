@@ -159,12 +159,18 @@ class TidalService
         if ($response->successful()) {
             $data = $response->json();
 
+            \Log::info('Tidal search response', [
+                'included_count' => count($data['included'] ?? []),
+                'sample_included' => isset($data['included'][0]) ? $data['included'][0] : null,
+            ]);
+
             // Build a map of coverArt by ID from included resources
             $coverArtMap = [];
             if (!empty($data['included'])) {
                 foreach ($data['included'] as $item) {
                     if (isset($item['type']) && $item['type'] === 'images') {
                         $coverArtMap[$item['id']] = $item;
+                        \Log::info('Found coverArt', ['id' => $item['id'], 'data' => $item]);
                     }
                 }
             }
@@ -174,11 +180,17 @@ class TidalService
                 $albums = [];
                 foreach ($data['included'] as $item) {
                     if (isset($item['type']) && $item['type'] === 'albums') {
+                        \Log::info('Processing album', [
+                            'title' => $item['attributes']['title'] ?? 'unknown',
+                            'relationships' => $item['relationships'] ?? [],
+                        ]);
+
                         // Attach coverArt data if available
                         if (!empty($item['relationships']['coverArt']['data'][0]['id'])) {
                             $coverArtId = $item['relationships']['coverArt']['data'][0]['id'];
                             if (isset($coverArtMap[$coverArtId])) {
                                 $item['coverArt'] = $coverArtMap[$coverArtId];
+                                \Log::info('Attached coverArt to album', ['coverArtId' => $coverArtId]);
                             }
                         }
                         $albums[] = $item;
