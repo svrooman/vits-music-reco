@@ -107,16 +107,46 @@ class DiscoveredAlbumResource extends Resource
                     ->icon('heroicon-o-musical-note')
                     ->color('success')
                     ->hidden(fn ($record) => $record->tidal_added)
-                    ->requiresConfirmation()
-                    ->action(function ($record) {
+                    ->form(function ($record) use ($tidalService = null) {
                         $user = Auth::user();
 
-                        // Check if user is authenticated with Tidal
+                        if (!$user->tidal_access_token) {
+                            return [];
+                        }
+
+                        $tidalService = app(TidalService::class);
+                        $matches = $tidalService->searchAlbums($record->artist, $record->album, $user->tidal_access_token);
+
+                        if (empty($matches)) {
+                            return [];
+                        }
+
+                        $options = [];
+                        foreach ($matches as $match) {
+                            $title = $match['attributes']['title'] ?? 'Unknown';
+                            $releaseDate = isset($match['attributes']['releaseDate'])
+                                ? date('Y', strtotime($match['attributes']['releaseDate']))
+                                : '';
+                            $label = $releaseDate ? "{$title} ({$releaseDate})" : $title;
+                            $options[$match['id']] = $label;
+                        }
+
+                        return [
+                            Forms\Components\Radio::make('album_id')
+                                ->label('Select Album')
+                                ->options($options)
+                                ->required()
+                                ->default(array_key_first($options)),
+                        ];
+                    })
+                    ->action(function ($record, array $data) {
+                        $user = Auth::user();
+
                         if (!$user->tidal_access_token) {
                             Notification::make()
                                 ->title('Connect to Tidal first')
                                 ->warning()
-                                ->body('Please connect your Tidal account before adding albums.')
+                                ->body('Please connect your Tidal account.')
                                 ->actions([
                                     \Filament\Notifications\Actions\Action::make('connect')
                                         ->button()
@@ -126,13 +156,16 @@ class DiscoveredAlbumResource extends Resource
                             return;
                         }
 
-                        // Add to Tidal
+                        if (empty($data['album_id'])) {
+                            Notification::make()
+                                ->title('No album selected')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
                         $tidalService = app(TidalService::class);
-                        $result = $tidalService->searchAndAddAlbum(
-                            $record->artist,
-                            $record->album,
-                            $user->tidal_access_token
-                        );
+                        $result = $tidalService->addAlbumById($data['album_id'], $user->tidal_access_token);
 
                         if ($result['success']) {
                             $record->update([

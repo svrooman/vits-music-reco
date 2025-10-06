@@ -129,19 +129,23 @@ class TidalService
     }
 
     /**
-     * Search for an album on Tidal
+     * Search for an album on Tidal (returns first match)
      */
     public function searchAlbum(string $artist, string $album, string $accessToken): ?array
+    {
+        $albums = $this->searchAlbums($artist, $album, $accessToken);
+        return $albums[0] ?? null;
+    }
+
+    /**
+     * Search for albums on Tidal (returns all matches)
+     */
+    public function searchAlbums(string $artist, string $album, string $accessToken): array
     {
         $query = "{$artist} - {$album}";
         $encodedQuery = urlencode($query);
 
         $url = "{$this->apiUrl}/v2/searchResults/{$encodedQuery}";
-
-        \Log::info('Tidal: Searching for album', [
-            'query' => $query,
-            'url' => $url,
-        ]);
 
         $response = Http::withToken($accessToken)
             ->withHeaders([
@@ -152,35 +156,22 @@ class TidalService
                 'include' => 'albums',
             ]);
 
-        \Log::info('Tidal: Search response', [
-            'status' => $response->status(),
-            'successful' => $response->successful(),
-            'body' => $response->body(),
-        ]);
-
         if ($response->successful()) {
             $data = $response->json();
 
             // Tidal API returns albums in the 'included' array (JSON:API format)
             if (!empty($data['included'])) {
-                \Log::info('Tidal: Found included items', ['count' => count($data['included'])]);
-
-                // Find first album in included array
+                $albums = [];
                 foreach ($data['included'] as $item) {
                     if (isset($item['type']) && $item['type'] === 'albums') {
-                        \Log::info('Tidal: Found album', [
-                            'id' => $item['id'],
-                            'title' => $item['attributes']['title'] ?? 'unknown'
-                        ]);
-                        return $item;
+                        $albums[] = $item;
                     }
                 }
+                return $albums;
             }
-
-            \Log::warning('Tidal: No albums found in response', ['keys' => array_keys($data)]);
         }
 
-        return null;
+        return [];
     }
 
     /**
@@ -213,6 +204,44 @@ class TidalService
     }
 
     /**
+     * Add album by ID to user's favorites
+     */
+    public function addAlbumById(string $albumId, string $accessToken): array
+    {
+        // Get user ID
+        $userId = $this->getUserId($accessToken);
+
+        if (!$userId) {
+            return [
+                'success' => false,
+                'message' => 'Could not retrieve user ID',
+            ];
+        }
+
+        // Add to favorites using v2 API
+        $response = Http::withToken($accessToken)
+            ->withHeaders([
+                'Accept' => 'application/vnd.api+json',
+                'Content-Type' => 'application/vnd.api+json',
+            ])
+            ->put("{$this->apiUrl}/v2/users/{$userId}/favorites/albums/{$albumId}", [
+                'countryCode' => 'US',
+            ]);
+
+        if ($response->successful()) {
+            return [
+                'success' => true,
+                'message' => "Added to Tidal",
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to add album to favorites: ' . $response->body(),
+        ];
+    }
+
+    /**
      * Search and add album to favorites (convenience method)
      */
     public function searchAndAddAlbum(string $artist, string $album, string $accessToken): array
@@ -227,46 +256,16 @@ class TidalService
             ];
         }
 
-        // Get user ID
-        $userId = $this->getUserId($accessToken);
-
-        if (!$userId) {
-            return [
-                'success' => false,
-                'message' => 'Could not retrieve user ID',
-            ];
-        }
-
         $albumId = $tidalAlbum['id'];
         $albumTitle = $tidalAlbum['attributes']['title'] ?? 'Unknown Album';
 
-        // Add to favorites using v2 API
-        $response = Http::withToken($accessToken)
-            ->withHeaders([
-                'Accept' => 'application/vnd.api+json',
-                'Content-Type' => 'application/vnd.api+json',
-            ])
-            ->put("{$this->apiUrl}/v2/users/{$userId}/favorites/albums/{$albumId}", [
-                'countryCode' => 'US',
-            ]);
+        $result = $this->addAlbumById($albumId, $accessToken);
 
-        \Log::info('Tidal: Add to favorites response', [
-            'status' => $response->status(),
-            'successful' => $response->successful(),
-            'body' => $response->body(),
-        ]);
-
-        if ($response->successful()) {
-            return [
-                'success' => true,
-                'message' => "Added to Tidal: {$albumTitle}",
-                'tidal_album' => $tidalAlbum,
-            ];
+        if ($result['success']) {
+            $result['message'] = "Added to Tidal: {$albumTitle}";
+            $result['tidal_album'] = $tidalAlbum;
         }
 
-        return [
-            'success' => false,
-            'message' => 'Failed to add album to favorites: ' . $response->body(),
-        ];
+        return $result;
     }
 }
