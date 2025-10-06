@@ -137,14 +137,14 @@ class TidalService
 
         \Log::info('Tidal: Searching for album', [
             'query' => $query,
-            'url' => "{$this->apiUrl}/v2/searchresults/top-hits",
+            'url' => "{$this->apiUrl}/v2/searchResults/top-hits",
         ]);
 
         $response = Http::withToken($accessToken)
             ->withHeaders([
                 'Accept' => 'application/vnd.tidal.v1+json',
             ])
-            ->get("{$this->apiUrl}/v2/searchresults/top-hits", [
+            ->get("{$this->apiUrl}/v2/searchResults/top-hits", [
                 'query' => $query,
                 'countryCode' => 'US',
             ]);
