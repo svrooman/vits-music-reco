@@ -107,7 +107,7 @@ class DiscoveredAlbumResource extends Resource
                     ->icon('heroicon-o-musical-note')
                     ->color('success')
                     ->hidden(fn ($record) => $record->tidal_added)
-                    ->form(function ($record) use ($tidalService = null) {
+                    ->form(function ($record) {
                         $user = Auth::user();
 
                         if (!$user->tidal_access_token) {
