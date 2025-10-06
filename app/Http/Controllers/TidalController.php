@@ -29,7 +29,23 @@ class TidalController extends Controller
      */
     public function handleTidalCallback(Request $request)
     {
+        \Log::info('Tidal callback received', [
+            'all_params' => $request->all(),
+            'query' => $request->query(),
+        ]);
+
         $code = $request->get('code');
+        $error = $request->get('error');
+        $errorDescription = $request->get('error_description');
+
+        if ($error) {
+            \Log::error('Tidal callback: Error from Tidal', [
+                'error' => $error,
+                'description' => $errorDescription,
+            ]);
+            return redirect('/admin/discovered-albums')
+                ->with('error', "Tidal authorization failed: {$error} - {$errorDescription}");
+        }
 
         if (!$code) {
             \Log::error('Tidal callback: No code received');
