@@ -152,7 +152,7 @@ class TidalService
         \Log::info('Tidal: Search response', [
             'status' => $response->status(),
             'successful' => $response->successful(),
-            'body' => substr($response->body(), 0, 500),
+            'body' => $response->body(),
         ]);
 
         if ($response->successful()) {
