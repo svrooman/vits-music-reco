@@ -42,6 +42,13 @@ return [
         'redirect_uri' => env('SPOTIFY_REDIRECT_URI'),
     ],
 
+    'tidal' => [
+        'api_url' => env('TIDAL_API_URL', 'https://openapi.tidal.com'),
+        'client_id' => env('TIDAL_CLIENT_ID'),
+        'client_secret' => env('TIDAL_CLIENT_SECRET'),
+        'redirect_uri' => env('TIDAL_REDIRECT_URI'),
+    ],
+
     'openai' => [
         'api_key' => env('OPENAI_API_KEY'),
     ],

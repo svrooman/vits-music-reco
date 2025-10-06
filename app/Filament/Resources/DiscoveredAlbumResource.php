@@ -47,8 +47,17 @@ class DiscoveredAlbumResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
+                Forms\Components\TagsInput::make('tags')
+                    ->placeholder('Add tags (e.g., electronic, ambient, 2025)')
+                    ->columnSpanFull(),
                 Forms\Components\DateTimePicker::make('discovered_at')
                     ->default(now()),
+                Forms\Components\Toggle::make('tidal_added')
+                    ->label('Added to Tidal')
+                    ->disabled(),
+                Forms\Components\DateTimePicker::make('tidal_added_at')
+                    ->label('Tidal Added At')
+                    ->disabled(),
             ]);
     }
 
@@ -67,6 +76,13 @@ class DiscoveredAlbumResource extends Resource
                 Tables\Columns\TextColumn::make('source')
                     ->badge()
                     ->sortable(),
+                Tables\Columns\IconColumn::make('tidal_added')
+                    ->label('Tidal')
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('tags')
+                    ->badge()
+                    ->separator(','),
                 Tables\Columns\TextColumn::make('discovered_at')
                     ->dateTime()
                     ->sortable(),
@@ -79,13 +95,44 @@ class DiscoveredAlbumResource extends Resource
                         'instagram' => 'Instagram',
                         'other' => 'Other',
                     ]),
+                Tables\Filters\TernaryFilter::make('tidal_added')
+                    ->label('Added to Tidal'),
             ])
             ->actions([
+                Tables\Actions\Action::make('addToTidal')
+                    ->label('Add to Tidal')
+                    ->icon('heroicon-o-musical-note')
+                    ->color('success')
+                    ->hidden(fn ($record) => $record->tidal_added)
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+                        // TODO: Implement Tidal OAuth and add logic
+                        $record->update([
+                            'tidal_added' => true,
+                            'tidal_added_at' => now(),
+                        ]);
+                    }),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('addToTidal')
+                        ->label('Add to Tidal')
+                        ->icon('heroicon-o-musical-note')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                if (!$record->tidal_added) {
+                                    // TODO: Implement Tidal OAuth and add logic
+                                    $record->update([
+                                        'tidal_added' => true,
+                                        'tidal_added_at' => now(),
+                                    ]);
+                                }
+                            }
+                        }),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
