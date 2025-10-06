@@ -21,7 +21,7 @@ class TidalService
     }
 
     /**
-     * Get authorization URL for OAuth flow
+     * Get authorization URL for OAuth flow with PKCE
      */
     public function getAuthUrl(): string
     {
@@ -38,32 +38,73 @@ class TidalService
             'search.write',
         ];
 
+        // Generate PKCE code verifier and challenge
+        $codeVerifier = $this->generateCodeVerifier();
+        $codeChallenge = $this->generateCodeChallenge($codeVerifier);
+
+        // Store code verifier in session for callback
+        session(['tidal_code_verifier' => $codeVerifier]);
+
         $params = http_build_query([
             'response_type' => 'code',
             'client_id' => $this->clientId,
             'redirect_uri' => $this->redirectUri,
             'scope' => implode(' ', $scopes),
+            'code_challenge' => $codeChallenge,
+            'code_challenge_method' => 'S256',
         ]);
 
         return "https://login.tidal.com/authorize?{$params}";
     }
 
     /**
-     * Exchange authorization code for access token
+     * Generate PKCE code verifier
+     */
+    private function generateCodeVerifier(): string
+    {
+        return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+    }
+
+    /**
+     * Generate PKCE code challenge from verifier
+     */
+    private function generateCodeChallenge(string $codeVerifier): string
+    {
+        return rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
+    }
+
+    /**
+     * Exchange authorization code for access token with PKCE
      */
     public function getAccessToken(string $code): ?array
     {
+        $codeVerifier = session('tidal_code_verifier');
+
+        if (!$codeVerifier) {
+            \Log::error('Tidal: No code verifier found in session');
+            return null;
+        }
+
         $response = Http::asForm()->post('https://auth.tidal.com/v1/oauth2/token', [
             'grant_type' => 'authorization_code',
             'code' => $code,
             'redirect_uri' => $this->redirectUri,
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
+            'code_verifier' => $codeVerifier,
         ]);
+
+        // Clear the code verifier from session
+        session()->forget('tidal_code_verifier');
 
         if ($response->successful()) {
             return $response->json();
         }
+
+        \Log::error('Tidal token exchange failed', [
+            'status' => $response->status(),
+            'body' => $response->body(),
+        ]);
 
         return null;
     }
