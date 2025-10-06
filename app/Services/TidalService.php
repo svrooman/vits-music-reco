@@ -207,7 +207,7 @@ class TidalService
     }
 
     /**
-     * Add album by ID to user's favorites
+     * Add album by ID to user's collection
      */
     public function addAlbumById(string $albumId, string $accessToken): array
     {
@@ -221,14 +221,19 @@ class TidalService
             ];
         }
 
-        // Add to favorites using v2 API
+        // Add to collection using v2 API
         $response = Http::withToken($accessToken)
             ->withHeaders([
                 'Accept' => 'application/vnd.api+json',
                 'Content-Type' => 'application/vnd.api+json',
             ])
-            ->put("{$this->apiUrl}/v2/users/{$userId}/favorites/albums/{$albumId}", [
-                'countryCode' => 'US',
+            ->post("{$this->apiUrl}/v2/userCollections/{$userId}/relationships/albums", [
+                'data' => [
+                    [
+                        'id' => $albumId,
+                        'type' => 'albums',
+                    ],
+                ],
             ]);
 
         if ($response->successful()) {
@@ -240,7 +245,7 @@ class TidalService
 
         return [
             'success' => false,
-            'message' => 'Failed to add album to favorites: ' . $response->body(),
+            'message' => 'Failed to add album to collection: ' . $response->body(),
         ];
     }
 
