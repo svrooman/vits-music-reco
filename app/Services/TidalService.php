@@ -193,11 +193,14 @@ class TidalService
     public function getUserId(string $accessToken): ?string
     {
         $response = Http::withToken($accessToken)
-            ->get("{$this->apiUrl}/users/me");
+            ->withHeaders([
+                'Accept' => 'application/vnd.api+json',
+            ])
+            ->get("{$this->apiUrl}/v2/users/me");
 
         if ($response->successful()) {
             $data = $response->json();
-            return $data['id'] ?? null;
+            return $data['data']['id'] ?? null;
         }
 
         return null;
