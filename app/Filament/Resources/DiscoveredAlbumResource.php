@@ -107,6 +107,7 @@ class DiscoveredAlbumResource extends Resource
                     ->icon('heroicon-o-musical-note')
                     ->color('success')
                     ->hidden(fn ($record) => $record->tidal_added)
+                    ->modalWidth('3xl')
                     ->form(function ($record) {
                         $user = Auth::user();
 
@@ -132,11 +133,15 @@ class DiscoveredAlbumResource extends Resource
                         }
 
                         return [
-                            Forms\Components\Radio::make('album_id')
-                                ->label('Select Album')
-                                ->options($options)
-                                ->required()
-                                ->default(array_key_first($options)),
+                            Forms\Components\ViewField::make('album_selection')
+                                ->view('filament.forms.tidal-album-selector')
+                                ->viewData([
+                                    'matches' => $matches,
+                                    'sourceAlbum' => $record,
+                                ]),
+                            Forms\Components\Hidden::make('album_id')
+                                ->default(array_key_first($options))
+                                ->required(),
                         ];
                     })
                     ->action(function ($record, array $data) {
